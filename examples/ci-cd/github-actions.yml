@@ -8,7 +8,7 @@
 #
 # Prerequisites:
 # - OPENAI_API_KEY secret configured in repository settings
-# - codex.toml with [profile.ci] section in the repository
+# - .codex/config.toml with a [profiles.ci] section in the repository
 
 name: Codex CI
 
@@ -107,7 +107,8 @@ jobs:
       - name: Check documentation
         run: |
           codex --profile ci exec \
-            "Check if all public exports in src/ have corresponding \
-             documentation. List any undocumented public functions or types."
+            "Check whether README.md, best-practice/, and reports/ use the \
+             current Codex CLI schema. List any stale paths, commands, or \
+             configuration keys."
         env:
           OPENAI_API_KEY: ${{ secrets.OPENAI_API_KEY }}

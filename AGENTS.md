@@ -11,8 +11,9 @@ This is a best practices repository for OpenAI Codex CLI configuration, demonstr
 ### Weather System (Example Workflow)
 
 A demonstration of multi-step skill orchestration:
-- `weather-fetcher` skill (`.agents/skills/weather-fetcher/SKILL.md`): Fetches temperature from the wttr.in API for a given city
+- `weather-fetcher` skill (`.agents/skills/weather-fetcher/SKILL.md`): Fetches temperature from the Open-Meteo API for a given city
 - `weather-svg-creator` skill (`.agents/skills/weather-svg-creator/SKILL.md`): Creates an SVG weather card, writes `orchestration-workflow/weather.svg` and `orchestration-workflow/output.md`
+- `weather-agent` (`.codex/agents/weather-agent.toml`): Agent role config that preloads `weather-fetcher`
 
 The orchestration flow: user provides city and unit preference, the fetcher skill retrieves data, and the SVG creator skill renders the visual output. See `orchestration-workflow/orchestration-workflow.md` for the complete flow diagram.
 
@@ -40,10 +41,10 @@ Codex CLI uses TOML-based configuration at two levels:
 
 1. `.codex/config.toml`: Team-shared project settings (checked in)
 2. `~/.codex/config.toml`: Personal user-level settings
-3. CLI flags (`--model`, `--approval-policy`): Override both config files
+3. CLI flags (`--model`, `--ask-for-approval`, `--sandbox`): Override both config files
 4. `--config key=value`: One-off overrides from the command line
 
-### Built-in Skills
+### Agents and Skills
 
 Skills are discovered from multiple scopes in order of precedence:
 1. `$CWD/.agents/skills` — current working directory (most specific)
@@ -51,6 +52,9 @@ Skills are discovered from multiple scopes in order of precedence:
 3. `$REPO_ROOT/.agents/skills` — repository root
 4. `$HOME/.agents/skills` — user-level personal skills
 5. `/etc/codex/skills` — system/admin-level shared skills
+
+Agents are registered under `[agents.<name>]` in `.codex/config.toml` and can
+optionally point to dedicated role files in `.codex/agents/*.toml`.
 
 ## AGENTS.md Discovery
 
@@ -62,7 +66,7 @@ Define named profiles in `config.toml` under `[profiles.<name>]` to switch betwe
 
 ```bash
 codex --profile conservative   # read-only, asks before every action
-codex --profile trusted         # full autonomy, uses o3
+codex --profile trusted        # no approval prompts, workspace-write sandbox
 ```
 
 Set a default profile with `profile = "conservative"` at the top level of `config.toml`.
@@ -92,12 +96,13 @@ From experience with this repository:
 
 ## Documentation
 
-- `docs/AGENTS.md`: Detailed AGENTS.md authoring guide
+- `best-practice/codex-agents-md.md`: Detailed AGENTS.md authoring guide
 - `docs/SKILLS.md`: Skills system reference
+- `best-practice/codex-config.md`: Current config, profiles, and MCP layout
 - `orchestration-workflow/orchestration-workflow.md`: Weather system flow diagram
 
 ## Reports
 
-- `reports/codex-cli-skills-guide.md`: Skill discovery, scopes, and progressive disclosure
-- `reports/codex-cli-config-guide.md`: Configuration reference, profiles, and MCP servers
-- `best-practice/codex-memory.md`: AGENTS.md loading behavior across directory hierarchies
+- `reports/config-hierarchy.md`: Configuration merge order and override strategy
+- `reports/approval-policies.md`: Approval policy behavior and tradeoffs
+- `reports/mcp-patterns.md`: MCP configuration and agent scoping patterns

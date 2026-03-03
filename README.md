@@ -23,7 +23,7 @@ practice makes codex perfect
 | [**Sandbox**](https://developers.openai.com/codex/cli/features) | `config.toml` → `sandbox_mode` | [![Best Practice](!/tags/best-practice.svg)](best-practice/codex-sandbox.md) OS-level isolation: `read-only` (no writes), `workspace-write` (no network), `danger-full-access` |
 | [**Approval Policy**](https://developers.openai.com/codex/cli/features) | `config.toml` → `approval_policy` | [![Best Practice](!/tags/best-practice.svg)](best-practice/codex-approval-policies.md) Autonomy levels: `untrusted` (ask everything), `on-request` (model decides), `never` (full auto) |
 | [**MCP Servers**](https://developers.openai.com/codex/mcp) | `config.toml` → `[mcp_servers.*]` | [![Best Practice](!/tags/best-practice.svg)](best-practice/codex-mcp.md) [![Implemented](!/tags/implemented.svg)](.codex/config.toml) Model Context Protocol for external tools — plus Codex-as-MCP-server pattern |
-| [**Agents**](https://developers.openai.com/codex/cli/features) | [`.codex/agents/<name>.md`](.codex/agents/) | [![Implemented](!/tags/implemented.svg)](.codex/agents/) Specialized subagents with their own model, tools, and preloaded skills |
+| [**Agents**](https://developers.openai.com/codex/cli/features) | [`.codex/config.toml`](.codex/config.toml) + [`.codex/agents/<name>.toml`](.codex/agents/) | [![Implemented](!/tags/implemented.svg)](.codex/agents/) Specialized subagents registered under `[agents.<name>]`, optionally backed by dedicated TOML role configs |
 | [**Headless / CI**](https://developers.openai.com/codex/noninteractive) | `codex exec "prompt"` | [![Best Practice](!/tags/best-practice.svg)](best-practice/codex-headless.md) Non-interactive execution for pipelines and scripts |
 | [**Sessions**](https://developers.openai.com/codex/cli/features) | `--resume`, `--fork` | [![Best Practice](!/tags/best-practice.svg)](best-practice/codex-sessions.md) Persistent sessions: resume where you left off or fork to explore alternatives |
 | [**Override**](https://developers.openai.com/codex/rules) | [`AGENTS.override.md`](AGENTS.override.md) | Personal instruction overrides — loaded before `AGENTS.md`, not committed to git |
@@ -40,7 +40,7 @@ See [orchestration-workflow](orchestration-workflow/orchestration-workflow.md) f
 |-----------|------|----------|
 | **weather-fetcher** | Fetches current temperature from Open-Meteo API | [`.agents/skills/weather-fetcher/SKILL.md`](.agents/skills/weather-fetcher/SKILL.md) |
 | **weather-svg-creator** | Creates SVG weather card | [`.agents/skills/weather-svg-creator/SKILL.md`](.agents/skills/weather-svg-creator/SKILL.md) |
-| **weather-agent** | Agent with preloaded weather-fetcher skill | [`.codex/agents/weather-agent.md`](.codex/agents/weather-agent.md) |
+| **weather-agent** | Agent with preloaded weather-fetcher skill | [`.codex/agents/weather-agent.toml`](.codex/agents/weather-agent.toml) |
 | **output.md** | Generated weather report | [`orchestration-workflow/output.md`](orchestration-workflow/output.md) |
 
 ## TIPS AND TRICKS
@@ -60,11 +60,11 @@ See [orchestration-workflow](orchestration-workflow/orchestration-workflow.md) f
 - Pair `approval_policy = "never"` with `read-only` sandbox in CI (safety from isolation)
 - Never use `danger-full-access` + `never` approval without understanding the risks
 - Use `$ENV_VAR` references for MCP server secrets — never hardcode tokens in config.toml
-- Scope MCP servers to specific agents via agent frontmatter
+- Scope MCP servers to specific agents via `[agents.<name>]` config
 
 **Debugging**
 - Use `codex --profile conservative` when investigating unexpected behavior
-- Check effective config with `codex config show --verbose`
+- Use `codex mcp list` and `codex features list` to inspect active integrations
 - Run `codex exec` with a simple prompt to validate CI configuration
 - Review auto-approved actions via `git log` and `git diff`
 

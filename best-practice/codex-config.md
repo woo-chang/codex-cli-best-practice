@@ -1,130 +1,102 @@
 # Best Practice: config.toml
 
-Codex CLI uses TOML for configuration, providing a human-readable alternative to JSON. Configuration supports layered precedence and named profiles.
+Codex CLI uses TOML configuration with a current, project-scoped layout. Keep
+the shared file in `.codex/config.toml`, keep personal defaults in
+`~/.codex/config.toml`, and use CLI flags or `-c key=value` for one-off
+overrides.
 
 ## Config File Locations
 
 | Location | Scope | Purpose |
 |---|---|---|
-| `~/.codex/config.toml` | Global | User-wide defaults |
-| `./codex.toml` | Project | Team-shared project settings |
-| `./codex.local.toml` | Local | Personal overrides (git-ignored) |
+| `~/.codex/config.toml` | Global | Personal defaults across projects |
+| `.codex/config.toml` | Project | Team-shared defaults, profiles, MCP, agents |
+| CLI flags / `-c` | Invocation | One-off overrides for a single run |
 
-**Precedence**: Local > Project > Global. More specific settings override general ones.
+**Precedence**: CLI flags and `-c` overrides > project config > user config.
 
 ## Basic Configuration
 
 ```toml
-# codex.toml — project-level config
+# .codex/config.toml
 model = "o4-mini"
-approval_policy = "auto-edit"
+sandbox_mode = "workspace-write"
+approval_policy = "on-request"
 
-[sandbox]
-mode = "network-only"
-
-[permissions]
-auto_approve = [
-  "bash(git:*)",
-  "read",
-  "glob",
-  "grep"
-]
+[profiles.review]
+model = "o3"
+sandbox_mode = "read-only"
+approval_policy = "on-request"
 ```
 
 ## Named Profiles
 
-Profiles let you switch between configurations without editing files:
+Profiles live under `[profiles.<name>]`:
 
 ```toml
-# Default settings
+[profiles.conservative]
+sandbox_mode = "read-only"
+approval_policy = "untrusted"
+
+[profiles.development]
+sandbox_mode = "workspace-write"
+approval_policy = "on-request"
+
+[profiles.ci]
 model = "o4-mini"
-approval_policy = "suggest"
-
-[sandbox]
-mode = "full"
-
-# CI profile: headless, fast, locked-down
-[profile.ci]
-model = "o4-mini"
-approval_policy = "full-auto"
-sandbox.mode = "full"
-
-# Development profile: permissive for local work
-[profile.dev]
-model = "o3"
-approval_policy = "auto-edit"
-sandbox.mode = "network-only"
-
-# Review profile: read-only analysis
-[profile.review]
-model = "o4-mini"
-approval_policy = "suggest"
-sandbox.mode = "full"
+sandbox_mode = "read-only"
+approval_policy = "never"
 ```
 
-Activate with: `codex --profile ci exec "run the test suite"`
+Activate with `codex --profile ci exec "review this repo"`.
 
-## Layer Strategy
+## Current Layout Patterns
 
-### Global Config (`~/.codex/config.toml`)
-Set personal defaults that apply everywhere:
+### Shared Project Defaults
+Commit only the settings the team agrees on:
+
 ```toml
 model = "o4-mini"
-approval_policy = "suggest"
+sandbox_mode = "workspace-write"
+approval_policy = "on-request"
 ```
 
-### Project Config (`codex.toml`)
-Commit to version control. Contains team-agreed settings:
+### MCP Servers
+Declare shared integrations in the same file:
+
 ```toml
-model = "o4-mini"
-approval_policy = "auto-edit"
-
-[sandbox]
-mode = "network-only"
-
-[permissions]
-auto_approve = ["bash(npm:*)", "bash(git:*)"]
-```
-
-### Local Config (`codex.local.toml`)
-Git-ignored. Personal overrides for your workflow:
-```toml
-model = "o3"
-approval_policy = "full-auto"
-
-[permissions]
-auto_approve = ["bash(*)"]
-```
-
-## Key Patterns
-
-### Principle of Least Privilege
-Start restrictive, open up as needed:
-1. Begin with `approval_policy = "suggest"` and `sandbox.mode = "full"`
-2. Add specific `auto_approve` patterns as trust builds
-3. Only use `full-auto` with comprehensive allow-lists
-
-### Environment-Specific Overrides
-Use profiles rather than editing config between tasks:
-- `--profile ci` for automated pipelines
-- `--profile dev` for local development
-- `--profile review` for code review sessions
-
-### MCP Server Configuration
-```toml
-[mcp.servers.filesystem]
-command = "npx"
-args = ["-y", "@modelcontextprotocol/server-filesystem", "/path/to/allowed"]
-
-[mcp.servers.github]
+[mcp_servers.github]
 command = "npx"
 args = ["-y", "@modelcontextprotocol/server-github"]
 env = { GITHUB_TOKEN = "$GITHUB_TOKEN" }
 ```
 
+### Agents
+Register agents under `[agents.<name>]` and optionally point them at dedicated
+role files:
+
+```toml
+[agents.backend-dev]
+description = "Handles backend implementation tasks"
+config_file = "agents/backend-dev.toml"
+```
+
+```toml
+# .codex/agents/backend-dev.toml
+model = "o4-mini"
+skills = ["api-conventions", "error-handling"]
+```
+
+### One-Off Overrides
+Use the CLI instead of inventing extra local config files:
+
+```bash
+codex -c model=\"o3\" -c approval_policy=\"never\" exec "summarize this diff"
+```
+
 ## Anti-Patterns
 
-- **Committing `codex.local.toml`**: Always git-ignore personal overrides
-- **Using `full-auto` without allow-lists**: Grants unrestricted execution
-- **Hardcoding paths**: Use environment variables for machine-specific values
-- **Mixing concerns in one profile**: Keep profiles focused (CI, dev, review)
+- Documenting retired Codex config schema from pre-`.codex/config.toml` releases
+- Hardcoding secrets instead of using `$ENV_VAR` expansion
+- Putting agent registration outside `.codex/config.toml`
+- Mixing unrelated concerns into one profile instead of creating focused profiles

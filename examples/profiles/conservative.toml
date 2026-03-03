@@ -10,13 +10,10 @@
 # This is the safest possible configuration.
 
 model = "o4-mini"
-approval_policy = "suggest"
+approval_policy = "untrusted"
+sandbox_mode = "read-only"
 
-[sandbox]
-mode = "full"
-
-# No auto-approve list — every action requires manual approval.
-# The full sandbox ensures no file writes persist and no network access.
+# Read-only sandbox prevents file changes and blocks network access.
 #
 # Usage:
 #   codex --profile conservative

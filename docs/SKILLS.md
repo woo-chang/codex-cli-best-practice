@@ -91,7 +91,22 @@ description: Team coding standards and conventions
 user-invocable: false
 ---
 ```
-Loaded into agent context via the `skills:` field in agent frontmatter. Never shown in `/` menu.
+Loaded into agent context via `[agents.<name>]` role configuration in `.codex/config.toml` and a companion TOML file:
+
+```toml
+# .codex/config.toml
+[agents.backend-dev]
+description = "Handles backend development tasks"
+config_file = "agents/backend-dev.toml"
+```
+
+```toml
+# .codex/agents/backend-dev.toml
+model = "o4-mini"
+skills = ["code-standards"]
+```
+
+Never shown in `/` menu.
 
 ### Forked Skill (Isolated Execution)
 ```yaml

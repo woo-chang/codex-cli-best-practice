@@ -2,7 +2,7 @@
 #
 # This file is checked into the repository and provides shared defaults
 # for all team members. Personal overrides go in ~/.codex/config.toml
-# or use CLI flags (--model, --approval-policy, --config key=value).
+# or use CLI flags (--model, --ask-for-approval, --config key=value).
 #
 # Reference: https://developers.openai.com/codex/config-reference/
 
@@ -91,7 +91,7 @@ approval_policy = "never"
 # Non-interactive, cost-efficient model, no approval prompts.
 [profiles.ci]
 model = "o4-mini"
-sandbox_mode = "workspace-write"
+sandbox_mode = "read-only"
 approval_policy = "never"
 
 # Review: Thorough code review with a powerful model.
@@ -100,3 +100,13 @@ approval_policy = "never"
 model = "o3"
 sandbox_mode = "read-only"
 approval_policy = "on-request"
+
+################################################################################
+# Agents
+################################################################################
+
+# Agents are registered in config and can point to dedicated TOML role files.
+[agents.weather-agent]
+description = "Fetches current temperature through Open-Meteo using the preloaded weather-fetcher skill."
+model = "o4-mini"
+config_file = "agents/weather-agent.toml"

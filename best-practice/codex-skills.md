@@ -21,25 +21,24 @@ allowed-tools: Bash, Read
 
 ### 2. Agent-Preloaded Skills (Background Knowledge)
 
-Loaded into an agent's context via the `skills:` field in agent frontmatter:
+Defined as regular skills, then attached to an agent through the current
+agent configuration model:
 
-```yaml
----
-name: api-conventions
-description: REST API design conventions for this project
-user-invocable: false
----
+```toml
+# .codex/config.toml
+[agents.api-developer]
+description = "Builds and reviews HTTP APIs"
+config_file = "agents/api-developer.toml"
 ```
 
-Referenced in agent definition:
-```yaml
-# agents/api-developer.md
----
-name: api-developer
-skills:
-  - api-conventions
-  - error-handling
----
+```toml
+# .codex/agents/api-developer.toml
+model = "o4-mini"
+skills = ["api-conventions", "error-handling"]
+
+prompt = """
+Work on backend APIs for this project.
+"""
 ```
 
 **Best for**: Domain knowledge that agents need but users never invoke directly.
@@ -131,15 +130,17 @@ Use a command to orchestrate multiple skills:
 ### Agent + Skills
 Agents with preloaded skills get domain expertise without user intervention:
 
-```yaml
-# agents/backend-dev.md
----
-name: backend-dev
-skills:
-  - api-conventions
-  - database-patterns
-  - error-handling
----
+```toml
+# .codex/config.toml
+[agents.backend-dev]
+description = "Handles backend development tasks"
+config_file = "agents/backend-dev.toml"
+```
+
+```toml
+# .codex/agents/backend-dev.toml
+model = "o4-mini"
+skills = ["api-conventions", "database-patterns", "error-handling"]
 ```
 
 ## Anti-Patterns

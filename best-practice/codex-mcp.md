@@ -1,124 +1,66 @@
 # Best Practice: MCP (Model Context Protocol)
 
-Codex CLI supports MCP for extending its capabilities with external tools. Uniquely, Codex CLI can also expose itself as an MCP server, enabling other agents to use it as a tool.
+Codex CLI uses `[mcp_servers.<name>]` in `.codex/config.toml` for MCP
+integrations, and it can also run as an MCP server via `codex mcp-server`.
 
 ## MCP Server Configuration
 
-Configure MCP servers in `codex.toml`:
-
 ```toml
-[mcp.servers.filesystem]
+[mcp_servers.filesystem]
 command = "npx"
-args = ["-y", "@modelcontextprotocol/server-filesystem", "/path/to/dir"]
+args = ["-y", "@modelcontextprotocol/server-filesystem", "."]
 
-[mcp.servers.github]
+[mcp_servers.github]
 command = "npx"
 args = ["-y", "@modelcontextprotocol/server-github"]
 env = { GITHUB_TOKEN = "$GITHUB_TOKEN" }
-
-[mcp.servers.postgres]
-command = "npx"
-args = ["-y", "@modelcontextprotocol/server-postgres"]
-env = { DATABASE_URL = "$DATABASE_URL" }
 ```
 
 ## Agent-Scoped MCP Servers
 
-Restrict MCP servers to specific agents to follow least-privilege:
-
-```yaml
-# agents/data-analyst.md
----
-name: data-analyst
-mcpServers:
-  - postgres
-  - filesystem
----
-```
-
-Only the `data-analyst` agent can access the database — other agents cannot.
-
-## Environment Variables
-
-Use `$ENV_VAR` syntax for secrets. Never hardcode tokens:
+Keep MCP access narrow by attaching servers to specific agents:
 
 ```toml
-# Good: references environment variable
-[mcp.servers.github]
-env = { GITHUB_TOKEN = "$GITHUB_TOKEN" }
-
-# Bad: hardcoded secret
-[mcp.servers.github]
-env = { GITHUB_TOKEN = "ghp_abc123..." }
+[agents.data-analyst]
+description = "Works with repository and database context"
+config_file = "agents/data-analyst.toml"
 ```
 
-## Codex-as-MCP-Server
+```toml
+# .codex/agents/data-analyst.toml
+model = "o4-mini"
+mcp_servers = ["filesystem", "github"]
+```
 
-Codex CLI can expose itself as an MCP tool, allowing other AI agents or applications to use it:
+## Codex as an MCP Server
 
 ```bash
-# Start Codex as an MCP server
-codex --as-mcp-server
+codex mcp-server
 ```
 
-This enables:
-- **Agent composition**: One AI agent uses Codex CLI as a coding tool
-- **IDE integration**: Editors can call Codex through the MCP protocol
-- **Pipeline orchestration**: CI systems can invoke Codex via MCP
-
-### Configuration for Consumers
-
-Other MCP-compatible tools can connect to Codex:
+Consumer example:
 
 ```json
 {
   "mcpServers": {
     "codex": {
       "command": "codex",
-      "args": ["--as-mcp-server"]
+      "args": ["mcp-server"]
     }
   }
 }
 ```
 
-## Common MCP Patterns
+## Security Guidance
 
-### File System Access
-```toml
-[mcp.servers.filesystem]
-command = "npx"
-args = ["-y", "@modelcontextprotocol/server-filesystem", "."]
-```
-Provides structured file operations beyond Codex's built-in tools.
-
-### Database Access
-```toml
-[mcp.servers.postgres]
-command = "npx"
-args = ["-y", "@modelcontextprotocol/server-postgres"]
-env = { DATABASE_URL = "$DATABASE_URL" }
-```
-Allows Codex to query databases for context during development.
-
-### Web Search
-```toml
-[mcp.servers.tavily]
-command = "npx"
-args = ["-y", "@tavily/mcp-server"]
-env = { TAVILY_API_KEY = "$TAVILY_API_KEY" }
-```
-
-## Security Considerations
-
-1. **Sandbox interaction**: MCP servers that need network access require `sandbox.mode = "off"` or `"network-only"`
-2. **Secret management**: Always use environment variables for tokens and credentials
-3. **Scope servers to agents**: Don't give every agent access to every MCP server
-4. **Audit MCP packages**: Review what tools an MCP server exposes before adding it
-5. **Approval policy**: MCP tool calls respect your approval policy — `suggest` mode will prompt before each MCP tool use
+1. Use `$ENV_VAR` references for secrets
+2. Scope MCP servers per agent instead of making every server globally available
+3. Prefer `workspace-write` or `read-only` when a server does not need network
+4. Switch to `danger-full-access` only when the MCP workflow truly requires network access
 
 ## Anti-Patterns
 
-- **Running MCP servers with `sandbox.mode = "full"`**: MCP servers need at minimum `network-only` to function
-- **Hardcoding secrets in config**: Use `$ENV_VAR` references
-- **Granting all agents access to all MCP servers**: Scope by agent
-- **Ignoring MCP server permissions**: Some MCP servers have broad capabilities (filesystem write, database drop) — review their tool lists
+- Documenting the retired MCP table naming from older Codex releases
+- Hardcoding tokens in config
+- Giving every agent the same MCP surface area
+- Using the retired one-flag MCP server syntax instead of `codex mcp-server`

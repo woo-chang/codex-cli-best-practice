@@ -1,155 +1,57 @@
 # Best Practice: Approval Policies
 
-Approval policies control how much autonomy Codex CLI has when executing commands and making changes. They are the primary mechanism for balancing productivity with safety.
+Approval policies control when Codex asks before executing model-generated
+actions. In the current CLI the supported values are `untrusted`,
+`on-request`, and `never`.
 
 ## Policy Levels
 
-| Policy | File Edits | Commands | User Interaction |
-|---|---|---|---|
-| `suggest` | Proposed, not applied | Proposed, not executed | Approve every action |
-| `auto-edit` | Applied automatically | Require approval | Approve commands only |
-| `full-auto` | Applied automatically | Auto-executed (if in allow-list) | Minimal interaction |
+| Policy | Behavior | Best for |
+|---|---|---|
+| `untrusted` | Auto-runs only trusted read-style commands; asks for the rest | New repos, audits, reviews |
+| `on-request` | Model decides when it should ask | Everyday development |
+| `never` | Never asks; failures come straight back to the model | Non-interactive runs and tightly controlled automation |
 
 ## Configuration
 
 ```toml
-# codex.toml
-approval_policy = "auto-edit"  # recommended default
+approval_policy = "on-request"
 ```
 
-## Policy Details
-
-### Suggest Mode
-
-Every action is proposed and requires explicit approval:
+## Recommended Combinations
 
 ```toml
-approval_policy = "suggest"
+[profiles.conservative]
+sandbox_mode = "read-only"
+approval_policy = "untrusted"
+
+[profiles.development]
+sandbox_mode = "workspace-write"
+approval_policy = "on-request"
+
+[profiles.ci]
+sandbox_mode = "read-only"
+approval_policy = "never"
 ```
 
-**Best for**:
-- Learning Codex CLI's behavior on a new project
-- Code review tasks where you want to see reasoning before changes
-- High-stakes operations (production configs, security-sensitive code)
-- Onboarding new team members to Codex workflows
+## Guidance
 
-**Trade-off**: Safest but slowest — every file edit and command needs a "yes."
+### `untrusted`
+Use this when you want Codex to stay in review mode. It is the safest option for
+unknown codebases and security-sensitive work.
 
-### Auto-Edit Mode
+### `on-request`
+Use this as the default in active development. It preserves momentum while
+still letting the model escalate when a command deserves explicit approval.
 
-File modifications are applied automatically; shell commands still require approval:
-
-```toml
-approval_policy = "auto-edit"
-```
-
-**Best for**:
-- Day-to-day development (the recommended default)
-- Refactoring tasks where file edits are the primary output
-- Situations where you trust file changes but want to review commands
-
-**Trade-off**: Good balance of speed and safety. File edits are reversible via git, but commands might not be.
-
-### Full-Auto Mode
-
-Both file edits and commands execute without approval, subject to the allow-list:
-
-```toml
-approval_policy = "full-auto"
-
-[permissions]
-auto_approve = [
-  "bash(git:*)",
-  "bash(npm test:*)",
-  "bash(npm run lint:*)",
-  "read",
-  "write",
-  "edit",
-  "glob",
-  "grep"
-]
-```
-
-**Best for**:
-- CI/CD pipelines (always pair with `sandbox.mode = "full"`)
-- Well-understood, repetitive tasks
-- Experienced users with comprehensive allow-lists
-
-**Trade-off**: Fastest but riskiest. Commands outside the allow-list still prompt for approval.
-
-## Allow-List Patterns
-
-The `auto_approve` list uses glob patterns to match tool invocations:
-
-```toml
-[permissions]
-auto_approve = [
-  # Git operations
-  "bash(git:*)",
-
-  # Test and lint (safe, read-only-ish)
-  "bash(npm test:*)",
-  "bash(npm run lint:*)",
-  "bash(pytest:*)",
-
-  # File operations
-  "read",
-  "write",
-  "edit",
-  "glob",
-  "grep",
-
-  # Specific commands
-  "bash(ls:*)",
-  "bash(cat:*)",
-  "bash(wc:*)"
-]
-```
-
-### Pattern Best Practices
-
-| Pattern | Matches | Risk Level |
-|---|---|---|
-| `bash(git:*)` | All git commands | Low |
-| `bash(npm test:*)` | Test execution | Low |
-| `bash(npm:*)` | All npm commands including `npm publish` | Medium |
-| `bash(rm:*)` | All rm commands | High |
-| `bash(*)` | Everything | Very High |
-
-**Rule of thumb**: Start with the narrowest patterns and expand only when you hit friction repeatedly.
-
-## Combining Sandbox + Approval
-
-The safest configurations pair restrictive sandbox with appropriate approval:
-
-| Configuration | Safety | Speed | Use Case |
-|---|---|---|---|
-| `full` + `suggest` | Maximum | Minimum | Security audits |
-| `full` + `full-auto` | High | High | CI pipelines |
-| `network-only` + `auto-edit` | Medium | Medium | Daily development |
-| `off` + `suggest` | Medium | Low | API-dependent tasks |
-| `off` + `full-auto` | Low | Maximum | Trusted automation |
-
-## Profile-Based Policies
-
-```toml
-# Conservative default
-approval_policy = "suggest"
-
-# Open up for known-safe tasks
-[profile.dev]
-approval_policy = "auto-edit"
-
-# Full automation for CI
-[profile.ci]
-approval_policy = "full-auto"
-sandbox.mode = "full"
-```
+### `never`
+Use this only when the surrounding sandbox or environment already provides the
+safety boundary. This is the right default for headless CI jobs and tightly
+scoped automation.
 
 ## Anti-Patterns
 
-- **`full-auto` without an allow-list**: Grants unrestricted command execution
-- **`full-auto` + `sandbox.mode = "off"`**: Maximum risk — no safety net
-- **`bash(*)` in allow-list**: Bypasses all command approval
-- **Never reviewing what `auto-edit` changed**: Use `git diff` regularly
-- **Same policy for all tasks**: Use profiles to match policy to context
+- Treating `never` as a general-purpose local default
+- Using `danger-full-access` and `never` together without a real containment boundary
+- Leaving review and CI tasks on the same approval profile
+- Teaching retired values like `suggest`, `auto-edit`, or `full-auto`

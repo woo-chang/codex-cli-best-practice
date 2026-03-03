@@ -1,48 +1,18 @@
 # Development Profile
 #
 # Balanced configuration for day-to-day local development:
-# - File edits apply automatically (reversible via git)
-# - Shell commands require approval
+# - Workspace writes are allowed
+# - The model can ask when it needs approval
 # - Network blocked (no accidental data exfiltration)
-# - Common dev tools pre-approved
 #
 # This is the recommended default for most developers.
 
-model = "o3"
-approval_policy = "auto-edit"
-
-[sandbox]
-mode = "network-only"
-
-[permissions]
-auto_approve = [
-  # File operations (auto-edit already allows these, but explicit is clearer)
-  "read",
-  "write",
-  "edit",
-  "glob",
-  "grep",
-
-  # Git operations
-  "bash(git:*)",
-
-  # Build and test
-  "bash(npm test:*)",
-  "bash(npm run test:*)",
-  "bash(npm run build:*)",
-  "bash(npm run lint:*)",
-  "bash(npm run format:*)",
-
-  # Common utilities
-  "bash(ls:*)",
-  "bash(cat:*)",
-  "bash(wc:*)",
-  "bash(which:*)",
-  "bash(node:*)",
-]
+model = "o4-mini"
+approval_policy = "on-request"
+sandbox_mode = "workspace-write"
 
 # Usage:
 #   codex --profile development
 #
-# Recommended as the project default in codex.toml.
+# Recommended as the project default in .codex/config.toml.
 # Override with --profile conservative when reviewing unfamiliar code.
