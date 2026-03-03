@@ -1,0 +1,88 @@
+# CI-specific Codex CLI configuration
+#
+# This config is optimized for automated pipeline execution:
+# - Fast model (o4-mini) for cost efficiency
+# - Full sandbox for maximum isolation
+# - Full-auto approval with scoped allow-list
+# - No network access (full sandbox blocks it)
+#
+# Usage:
+#   codex --profile ci exec "your prompt here"
+#
+# Or set as the project default for CI environments:
+#   CODEX_PROFILE=ci codex exec "your prompt here"
+
+# Default model for all profiles
+model = "o4-mini"
+
+# Default approval — conservative for interactive use
+approval_policy = "auto-edit"
+
+[sandbox]
+mode = "network-only"
+
+# ─────────────────────────────────────
+# CI Profile
+# ─────────────────────────────────────
+[profile.ci]
+model = "o4-mini"
+approval_policy = "full-auto"
+
+[profile.ci.sandbox]
+mode = "full"
+
+[profile.ci.permissions]
+auto_approve = [
+  # File reading tools (safe, read-only)
+  "read",
+  "glob",
+  "grep",
+
+  # Git operations (read-only in full sandbox)
+  "bash(git status:*)",
+  "bash(git diff:*)",
+  "bash(git log:*)",
+  "bash(git show:*)",
+
+  # Test execution
+  "bash(npm test:*)",
+  "bash(npm run test:*)",
+  "bash(pytest:*)",
+
+  # Lint and format checking
+  "bash(npm run lint:*)",
+  "bash(npm run format:*)",
+
+  # Build verification
+  "bash(npm run build:*)",
+]
+
+# ─────────────────────────────────────
+# Review Profile (read-only analysis)
+# ─────────────────────────────────────
+[profile.review]
+model = "o4-mini"
+approval_policy = "suggest"
+
+[profile.review.sandbox]
+mode = "full"
+
+# ─────────────────────────────────────
+# Development Profile (local work)
+# ─────────────────────────────────────
+[profile.dev]
+model = "o3"
+approval_policy = "auto-edit"
+
+[profile.dev.sandbox]
+mode = "network-only"
+
+[profile.dev.permissions]
+auto_approve = [
+  "read", "write", "edit", "glob", "grep",
+  "bash(git:*)",
+  "bash(npm:*)",
+  "bash(ls:*)",
+  "bash(cat:*)",
+  "bash(wc:*)",
+]
