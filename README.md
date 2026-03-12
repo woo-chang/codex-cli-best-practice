@@ -1,7 +1,7 @@
 # codex-cli-best-practice
 practice makes codex perfect
 
-![Last Updated](https://img.shields.io/badge/Last_Updated-Mar_07%2C_2026_03%3A14_PM_PKT-white?style=flat&labelColor=555) <a href="https://github.com/shanraisshan/codex-cli-best-practice/stargazers"><img src="https://img.shields.io/github/stars/shanraisshan/codex-cli-best-practice?style=flat&label=%E2%98%85&labelColor=555&color=white" alt="GitHub Stars"></a>
+![Last Updated](https://img.shields.io/badge/Last_Updated-Mar_12%2C_2026_12%3A18_PM_PKT-white?style=flat&labelColor=555) <a href="https://github.com/shanraisshan/codex-cli-best-practice/stargazers"><img src="https://img.shields.io/github/stars/shanraisshan/codex-cli-best-practice?style=flat&label=%E2%98%85&labelColor=555&color=white" alt="GitHub Stars"></a>
 
 [![Best Practice](!/tags/best-practice.svg)](best-practice/) *Click on this badge to show the latest best practice*<br>
 [![Implemented](!/tags/implemented.svg)](.codex/) *Click on this badge to show implementation in this repo*<br>
@@ -28,6 +28,8 @@ practice makes codex perfect
 | [**Sessions**](https://developers.openai.com/codex/cli/features) | `--resume`, `--fork` | [![Best Practice](!/tags/best-practice.svg)](best-practice/codex-sessions.md) Persistent sessions: resume where you left off or fork to explore alternatives |
 | [**Override**](https://developers.openai.com/codex/rules) | [`AGENTS.override.md`](AGENTS.override.md) | Personal instruction overrides — loaded before `AGENTS.md`, not committed to git |
 | [**Workflows**](https://developers.openai.com/codex/workflows/) | IDE, CLI, Cloud | [![Implemented](!/tags/implemented.svg)](orchestration-workflow/orchestration-workflow.md) End-to-end usage patterns — bug fixes, reviews, refactors, prototyping, and documentation updates |
+| **AI Terms** | | [![Best Practice](!/tags/best-practice.svg)](https://github.com/shanraisshan/claude-code-codex-cursor-gemini/blob/main/reports/ai-terms.md) Agentic Engineering · Context Engineering · Vibe Coding |
+| [**Best Practices**](https://developers.openai.com/codex/learn/best-practices) | | Official best practices · [Prompt Engineering](https://platform.openai.com/docs/guides/prompt-engineering) · [Codex Guides](https://developers.openai.com/codex/overview) |
 
 ### 🔥 Hot
 
