@@ -10,12 +10,11 @@ This is a best practices repository for OpenAI Codex CLI configuration, demonstr
 
 ### Weather System (Example Workflow)
 
-A demonstration of multi-step skill orchestration:
-- `weather-fetcher` skill (`.agents/skills/weather-fetcher/SKILL.md`): Fetches temperature from the Open-Meteo API for a given city
-- `weather-svg-creator` skill (`.agents/skills/weather-svg-creator/SKILL.md`): Creates an SVG weather card, writes `orchestration-workflow/weather.svg` and `orchestration-workflow/output.md`
-- `weather-agent` (`.codex/agents/weather-agent.toml`): Agent role config that preloads `weather-fetcher`
+A demonstration of the **Agent → Skill** orchestration pattern:
+- `weather-agent` (`.codex/agents/weather-agent.toml`): Entry point — fetches temperature from Open-Meteo API, invokes renderer skill
+- `weather-svg-creator` skill (`.agents/skills/weather-svg-creator/SKILL.md`): Invoked by agent — creates SVG weather card
 
-The orchestration flow: user provides city and unit preference, the fetcher skill retrieves data, and the SVG creator skill renders the visual output. See `orchestration-workflow/orchestration-workflow.md` for the complete flow diagram.
+The orchestration flow: agent fetches temperature from Open-Meteo (using caller-provided unit, defaults to Celsius), then invokes `/weather-svg-creator` to render the SVG output. See `orchestration-workflow/orchestration-workflow.md` for the complete flow diagram.
 
 ### Skill Definition Structure
 
@@ -77,7 +76,7 @@ From experience with this repository:
 
 - Keep AGENTS.md under 150 lines for reliable adherence
 - Use skills with clear `name` and `description` frontmatter for auto-discovery
-- Organize skills by feature domain (e.g., `weather-fetcher`, `weather-svg-creator`)
+- Organize skills by feature domain (e.g., `weather-svg-creator`)
 - Use profiles to switch between safety levels (`conservative` for review, `trusted` for development)
 - Use `AGENTS.override.md` for personal preferences without affecting the team
 - Break complex tasks into composable skills rather than monolithic instructions

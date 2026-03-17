@@ -7,7 +7,7 @@ The active weather agent configuration for this repository lives in
 This Markdown file remains as a human-readable companion for the example
 workflow:
 
-- The agent preloads the `weather-fetcher` skill
-- It fetches current temperature data from Open-Meteo
-- It returns temperature, city, and unit to the caller
-- It does not write files or create SVG output
+- The agent fetches current temperature from Open-Meteo API for Dubai
+- It uses the caller-provided unit preference, defaulting to Celsius
+- It invokes the `/weather-svg-creator` skill to create the SVG card
+- Codex CLI subagents do not support mid-turn user interaction or preloaded skills

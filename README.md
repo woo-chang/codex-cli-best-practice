@@ -1,11 +1,11 @@
 # codex-cli-best-practice
 practice makes codex perfect
 
-![Last Updated](https://img.shields.io/badge/Last_Updated-Mar_17%2C_2026_12%3A00_PM_PKT-white?style=flat&labelColor=555) <a href="https://github.com/shanraisshan/codex-cli-best-practice/stargazers"><img src="https://img.shields.io/github/stars/shanraisshan/codex-cli-best-practice?style=flat&label=%E2%98%85&labelColor=555&color=white" alt="GitHub Stars"></a>
+![Last Updated](https://img.shields.io/badge/Last_Updated-Mar_17%2C_2026_3%3A08_PM_PKT-white?style=flat&labelColor=555) <a href="https://github.com/shanraisshan/codex-cli-best-practice/stargazers"><img src="https://img.shields.io/github/stars/shanraisshan/codex-cli-best-practice?style=flat&label=%E2%98%85&labelColor=555&color=white" alt="GitHub Stars"></a>
 
 [![Best Practice](!/tags/best-practice.svg)](best-practice/) *Click on this badge to show the latest best practice*<br>
 [![Implemented](!/tags/implemented.svg)](.codex/) *Click on this badge to show implementation in this repo*<br>
-[![Orchestration Workflow](!/tags/orchestration-workflow.svg)](orchestration-workflow/orchestration-workflow.md) *Click on this badge to see the Skill → Skill orchestration workflow*
+[![Orchestration Workflow](!/tags/orchestration-workflow.svg)](orchestration-workflow/orchestration-workflow.md) *Click on this badge to see the Agent → Skill orchestration workflow*
 
 <p align="center">
   <img src="!/codex-jumping.svg" alt="Codex CLI mascot jumping" width="120" height="100">
@@ -15,19 +15,14 @@ practice makes codex perfect
 
 | Feature | Location | Description |
 |---------|----------|-------------|
-| [**Instructions**](https://developers.openai.com/codex/guides/agents-md) | [`AGENTS.md`](AGENTS.md) | [![Best Practice](!/tags/best-practice.svg)](best-practice/codex-agents-md.md) Project-level context for Codex CLI — loaded from every directory up to repo root, capped at 32 KiB. Fallback: `CODEX.md` |
-| [**Configuration**](https://developers.openai.com/codex/config-basic) | [`.codex/config.toml`](.codex/config.toml) | [![Best Practice](!/tags/best-practice.svg)](best-practice/codex-config.md) [![Implemented](!/tags/implemented.svg)](.codex/config.toml) TOML-based layered config: global (`~/.codex/`) → project (`.codex/`) → CLI flags |
-| [**Profiles**](https://developers.openai.com/codex/config-basic) | [`.codex/config.toml`](.codex/config.toml) | [![Best Practice](!/tags/best-practice.svg)](best-practice/codex-config.md) [![Implemented](!/tags/implemented.svg)](.codex/config.toml) Named config presets — `codex --profile ci`, `--profile conservative`, `--profile trusted` |
-| [**Skills**](https://developers.openai.com/codex/skills) | [`.agents/skills/<name>/SKILL.md`](.agents/skills/) | [![Best Practice](!/tags/best-practice.svg)](best-practice/codex-skills.md) [![Implemented](!/tags/implemented.svg)](.agents/skills/) [Reference](docs/SKILLS.md) Reusable instruction packages with YAML frontmatter — invoke with `/skill-name` or preload into agents |
-| [**Built-in Skills**](https://developers.openai.com/codex/skills) | `$plan`, `$skill-creator`, `$web-search` | Skills shipped with Codex CLI — planning, skill generation, and web search |
-| [**Sandbox**](https://developers.openai.com/codex/cli/features) | `config.toml` → `sandbox_mode` | [![Best Practice](!/tags/best-practice.svg)](best-practice/codex-sandbox.md) OS-level isolation: `read-only` (no writes), `workspace-write` (no network), `danger-full-access` |
-| [**Approval Policy**](https://developers.openai.com/codex/cli/features) | `config.toml` → `approval_policy` | [![Best Practice](!/tags/best-practice.svg)](best-practice/codex-approval-policies.md) Autonomy levels: `untrusted` (ask everything), `on-request` (model decides), `never` (full auto) |
+| [**Commands**](https://developers.openai.com/codex/cli/slash-commands) | `custom not supported` | Custom commands (`.codex/commands/`) are not yet supported — built-in only: `/plan`, `/skills`, `/experimental` |
+| [**Subagents**](https://developers.openai.com/codex/subagents) | [`.codex/agents/<name>.toml`](.codex/agents/) | [![Best Practice](!/tags/best-practice.svg)](best-practice/codex-subagents.md) [![Implemented](!/tags/implemented.svg)](.codex/agents/) Custom agents registered under `[agents.<name>]` with dedicated TOML role configs, CSV batch processing, and multi-agent orchestration |
+| [**Skills**](https://developers.openai.com/codex/skills) | [`.agents/skills/<name>/SKILL.md`](.agents/skills/) | [![Best Practice](!/tags/best-practice.svg)](best-practice/codex-skills.md) [![Implemented](!/tags/implemented.svg)](.agents/skills/) [Reference](docs/SKILLS.md) Reusable instruction packages with YAML frontmatter — invoke with `/skill-name` or preload into agents · Built-in: `$plan`, `$skill-creator`, `$web-search` |
+| [**Workflows**](https://developers.openai.com/codex/workflows/) | [`.codex/agents/weather-agent.toml`](.codex/agents/weather-agent.toml) | [![Orchestration Workflow](!/tags/orchestration-workflow.svg)](orchestration-workflow/orchestration-workflow.md) End-to-end usage patterns using the Agent → Skill pattern |
 | [**MCP Servers**](https://developers.openai.com/codex/mcp) | `config.toml` → `[mcp_servers.*]` | [![Best Practice](!/tags/best-practice.svg)](best-practice/codex-mcp.md) [![Implemented](!/tags/implemented.svg)](.codex/config.toml) Model Context Protocol for external tools — plus Codex-as-MCP-server pattern |
-| [**Agents**](https://developers.openai.com/codex/cli/features) | [`.codex/config.toml`](.codex/config.toml) + [`.codex/agents/<name>.toml`](.codex/agents/) | [![Implemented](!/tags/implemented.svg)](.codex/agents/) Specialized subagents registered under `[agents.<name>]`, optionally backed by dedicated TOML role configs |
-| [**Headless / CI**](https://developers.openai.com/codex/noninteractive) | `codex exec "prompt"` | [![Best Practice](!/tags/best-practice.svg)](best-practice/codex-headless.md) Non-interactive execution for pipelines and scripts |
-| [**Sessions**](https://developers.openai.com/codex/cli/features) | `--resume`, `--fork` | [![Best Practice](!/tags/best-practice.svg)](best-practice/codex-sessions.md) Persistent sessions: resume where you left off or fork to explore alternatives |
-| [**Override**](https://developers.openai.com/codex/rules) | [`AGENTS.override.md`](AGENTS.override.md) | Personal instruction overrides — loaded before `AGENTS.md`, not committed to git |
-| [**Workflows**](https://developers.openai.com/codex/workflows/) | IDE, CLI, Cloud | [![Implemented](!/tags/implemented.svg)](orchestration-workflow/orchestration-workflow.md) End-to-end usage patterns — bug fixes, reviews, refactors, prototyping, and documentation updates |
+| [**Config**](https://developers.openai.com/codex/config-basic) | [`.codex/config.toml`](.codex/config.toml) | [![Best Practice](!/tags/best-practice.svg)](best-practice/codex-config.md) [![Implemented](!/tags/implemented.svg)](.codex/config.toml) TOML-based layered config system · [Profiles](https://developers.openai.com/codex/config-basic) · [Sandbox](https://developers.openai.com/codex/cli/features) · [Approval Policy](https://developers.openai.com/codex/cli/features) · [Override](https://developers.openai.com/codex/rules) |
+| [**AGENTS.md**](https://developers.openai.com/codex/guides/agents-md) | [`AGENTS.md`](AGENTS.md) | [![Best Practice](!/tags/best-practice.svg)](best-practice/codex-agents-md.md) Project-level context for Codex CLI — loaded from every directory up to repo root, capped at 32 KiB. Fallback: `CODEX.md` |
+| [**Hooks**](https://developers.openai.com/codex/cli/features) | `.codex/hooks/` | [![Implemented](!/tags/implemented.svg)](https://github.com/shanraisshan/codex-cli-voice-hooks) User-defined shell scripts that run on specific events — notifications, sound feedback, and custom automation |
 | **AI Terms** | | [![Best Practice](!/tags/best-practice.svg)](https://github.com/shanraisshan/claude-code-codex-cursor-gemini/blob/main/reports/ai-terms.md) Agentic Engineering · Context Engineering · Vibe Coding |
 | [**Best Practices**](https://developers.openai.com/codex/learn/best-practices) | | Official best practices · [Prompt Engineering](https://platform.openai.com/docs/guides/prompt-engineering) · [Codex Guides](https://developers.openai.com/codex/overview) |
 
@@ -35,23 +30,24 @@ practice makes codex perfect
 
 | Feature | Location | Description |
 |---------|----------|-------------|
-| [**Subagents**](https://developers.openai.com/codex/subagents) | [`.codex/agents/<name>.toml`](.codex/agents/) | [![Best Practice](!/tags/best-practice.svg)](best-practice/codex-subagents.md) Custom agents, CSV batch processing, and multi-agent orchestration |
 | [**Multi-Agent**](https://developers.openai.com/codex/multi-agent/) | `/experimental` → Multi-agents | Spawn specialized sub-agents in parallel — fan-out work, collect results, and synthesize in one response |
 
 [![Orchestration Workflow](!/tags/orchestration-workflow-hd.svg)](orchestration-workflow/orchestration-workflow.md)
 
-See [orchestration-workflow](orchestration-workflow/orchestration-workflow.md) for full implementation details of the **Skill → Skill** sequential pipeline pattern.
+See [orchestration-workflow](orchestration-workflow/orchestration-workflow.md) for implementation details of the **Agent → Skill** pattern. The agent fetches temperature from Open-Meteo and invokes the SVG creator skill.
 
 <p align="center">
-  <img src="!/orchestration-workflow-diagram.svg" alt="Orchestration Workflow: Skill → Skill → Output" width="100%">
+  <img src="!/orchestration-workflow-diagram.svg" alt="Orchestration Workflow: Agent → Skill → Output" width="100%">
 </p>
 
-| Component | Role | Location |
-|-----------|------|----------|
-| **weather-fetcher** | Fetches current temperature from Open-Meteo API | [`.agents/skills/weather-fetcher/SKILL.md`](.agents/skills/weather-fetcher/SKILL.md) |
-| **weather-svg-creator** | Creates SVG weather card | [`.agents/skills/weather-svg-creator/SKILL.md`](.agents/skills/weather-svg-creator/SKILL.md) |
-| **weather-agent** | Agent with preloaded weather-fetcher skill | [`.codex/agents/weather-agent.toml`](.codex/agents/weather-agent.toml) |
-| **output.md** | Generated weather report | [`orchestration-workflow/output.md`](orchestration-workflow/output.md) |
+![How to Use](!/tags/how-to-use.svg)
+
+```bash
+codex
+> Fetch the current weather for Dubai in Celsius and create the SVG weather card output using the repo.
+```
+
+> **Note:** This workflow is not 100% in sync with the [Claude Code Best Practice](https://github.com/shanraisshan/claude-code-best-practice) orchestration workflow. Codex CLI does not yet support custom commands (`.codex/commands/`) or a stable ask-user tool for mid-turn user interaction. There is an experimental `tool/requestUserInput` in the Codex App Server docs and an internal `request_user_input` capability gated behind an under-development feature flag in codex-cli 0.115.0, but neither is publicly available yet.
 
 ## DEVELOPMENT WORKFLOWS
 - [Cross-Model Claude Code + Codex](https://github.com/shanraisshan/claude-code-best-practice/blob/main/development-workflows/cross-model-workflow/cross-model-workflow.md) [![Implemented](!/tags/implemented.svg)](https://github.com/shanraisshan/claude-code-best-practice/blob/main/development-workflows/cross-model-workflow/cross-model-workflow.md)

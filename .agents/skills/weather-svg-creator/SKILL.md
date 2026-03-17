@@ -55,7 +55,7 @@ Also write a markdown summary to `orchestration-workflow/output.md`:
 
 ## Expected Input
 
-Temperature value, unit, and city from the weather-fetcher skill:
+Temperature value, unit, and city from the calling agent:
 ```
 Temperature: [X]°[C/F]
 City: [City Name]

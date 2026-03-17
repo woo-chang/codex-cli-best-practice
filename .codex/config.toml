@@ -107,6 +107,6 @@ approval_policy = "on-request"
 
 # Agents are registered in config and can point to dedicated TOML role files.
 [agents.weather-agent]
-description = "Fetches current temperature through Open-Meteo using the preloaded weather-fetcher skill."
+description = "Fetches temperature from Open-Meteo for Dubai and invokes weather-svg-creator skill."
 model = "o4-mini"
 config_file = "agents/weather-agent.toml"

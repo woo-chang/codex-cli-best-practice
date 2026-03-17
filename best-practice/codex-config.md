@@ -1,37 +1,36 @@
-# Best Practice: config.toml
+# Best Practice: Config
 
-Codex CLI uses TOML configuration with a current, project-scoped layout. Keep
-the shared file in `.codex/config.toml`, keep personal defaults in
-`~/.codex/config.toml`, and use CLI flags or `-c key=value` for one-off
-overrides.
+A comprehensive guide to Codex CLI's TOML-based configuration system — covering config hierarchy, profiles, sandbox modes, and approval policies.
 
-## Config File Locations
+<table width="100%">
+<tr>
+<td><a href="../">← Back to Codex CLI Best Practice</a></td>
+<td align="right"><img src="../!/codex-jumping.svg" alt="Codex" width="60" /></td>
+</tr>
+</table>
 
-| Location | Scope | Purpose |
-|---|---|---|
-| `~/.codex/config.toml` | Global | Personal defaults across projects |
-| `.codex/config.toml` | Project | Team-shared defaults, profiles, MCP, agents |
-| CLI flags / `-c` | Invocation | One-off overrides for a single run |
+## Settings Hierarchy
 
-**Precedence**: CLI flags and `-c` overrides > project config > user config.
+Settings apply in order of precedence (highest to lowest):
 
-## Basic Configuration
+| Priority | Location | Scope | Purpose |
+|----------|----------|-------|---------|
+| 1 | CLI flags / `-c key=value` | Invocation | One-off overrides for a single run |
+| 2 | `.codex/config.toml` | Project | Team-shared defaults, profiles, MCP, agents |
+| 3 | `~/.codex/config.toml` | Global | Personal defaults across projects |
+
+## Core Configuration
 
 ```toml
 # .codex/config.toml
 model = "o4-mini"
 sandbox_mode = "workspace-write"
 approval_policy = "on-request"
-
-[profiles.review]
-model = "o3"
-sandbox_mode = "read-only"
-approval_policy = "on-request"
 ```
 
-## Named Profiles
+## Profiles
 
-Profiles live under `[profiles.<name>]`:
+Named presets under `[profiles.<name>]` — switch with `codex --profile <name>`:
 
 ```toml
 [profiles.conservative]
@@ -46,23 +45,37 @@ approval_policy = "on-request"
 model = "o4-mini"
 sandbox_mode = "read-only"
 approval_policy = "never"
+
+[profiles.trusted]
+sandbox_mode = "danger-full-access"
+approval_policy = "never"
 ```
 
-Activate with `codex --profile ci exec "review this repo"`.
+Set a default profile with `profile = "conservative"` at the top level.
 
-## Current Layout Patterns
+## Sandbox Modes
 
-### Shared Project Defaults
-Commit only the settings the team agrees on:
+| Mode | File Access | Network | Best for |
+|---|---|---|---|
+| `read-only` | Read-only project access | Blocked | Reviews, audits, CI analysis |
+| `workspace-write` | Read/write inside the workspace | Blocked | Local development and doc/code edits |
+| `danger-full-access` | Unrestricted filesystem access | Allowed | Fully trusted automation that needs network or installs |
 
-```toml
-model = "o4-mini"
-sandbox_mode = "workspace-write"
-approval_policy = "on-request"
-```
+## Approval Policies
 
-### MCP Servers
-Declare shared integrations in the same file:
+| Policy | Behavior | Best for |
+|---|---|---|
+| `untrusted` | Auto-runs only trusted read-style commands; asks for the rest | New repos, audits, reviews |
+| `on-request` | Model decides when it should ask | Everyday development |
+| `never` | Never asks; failures come straight back to the model | Non-interactive runs and tightly controlled automation |
+
+## Override
+
+Use `AGENTS.override.md` for personal instruction overrides — loaded before `AGENTS.md`, not committed to git.
+
+## MCP Servers
+
+Declare shared integrations in the same config file:
 
 ```toml
 [mcp_servers.github]
@@ -71,9 +84,9 @@ args = ["-y", "@modelcontextprotocol/server-github"]
 env = { GITHUB_TOKEN = "$GITHUB_TOKEN" }
 ```
 
-### Agents
-Register agents under `[agents.<name>]` and optionally point them at dedicated
-role files:
+## Agents
+
+Register agents under `[agents.<name>]` and optionally point them at dedicated role files:
 
 ```toml
 [agents.backend-dev]
@@ -81,14 +94,7 @@ description = "Handles backend implementation tasks"
 config_file = "agents/backend-dev.toml"
 ```
 
-```toml
-# .codex/agents/backend-dev.toml
-model = "o4-mini"
-skills = ["api-conventions", "error-handling"]
-```
-
-### One-Off Overrides
-Use the CLI instead of inventing extra local config files:
+## One-Off Overrides
 
 ```bash
 codex -c model=\"o3\" -c approval_policy=\"never\" exec "summarize this diff"
@@ -96,7 +102,8 @@ codex -c model=\"o3\" -c approval_policy=\"never\" exec "summarize this diff"
 
 ## Anti-Patterns
 
-- Documenting retired Codex config schema from pre-`.codex/config.toml` releases
+- Using `danger-full-access` for ordinary editing tasks
+- Treating `never` as a general-purpose local default
+- Using `danger-full-access` and `never` together without a real containment boundary
 - Hardcoding secrets instead of using `$ENV_VAR` expansion
-- Putting agent registration outside `.codex/config.toml`
 - Mixing unrelated concerns into one profile instead of creating focused profiles
