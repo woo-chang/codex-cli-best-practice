@@ -1,7 +1,7 @@
 # codex-cli-best-practice
 practice makes codex perfect
 
-![Last Updated](https://img.shields.io/badge/Last_Updated-Mar_12%2C_2026_12%3A18_PM_PKT-white?style=flat&labelColor=555) <a href="https://github.com/shanraisshan/codex-cli-best-practice/stargazers"><img src="https://img.shields.io/github/stars/shanraisshan/codex-cli-best-practice?style=flat&label=%E2%98%85&labelColor=555&color=white" alt="GitHub Stars"></a>
+![Last Updated](https://img.shields.io/badge/Last_Updated-Mar_17%2C_2026_12%3A00_PM_PKT-white?style=flat&labelColor=555) <a href="https://github.com/shanraisshan/codex-cli-best-practice/stargazers"><img src="https://img.shields.io/github/stars/shanraisshan/codex-cli-best-practice?style=flat&label=%E2%98%85&labelColor=555&color=white" alt="GitHub Stars"></a>
 
 [![Best Practice](!/tags/best-practice.svg)](best-practice/) *Click on this badge to show the latest best practice*<br>
 [![Implemented](!/tags/implemented.svg)](.codex/) *Click on this badge to show implementation in this repo*<br>
@@ -35,6 +35,7 @@ practice makes codex perfect
 
 | Feature | Location | Description |
 |---------|----------|-------------|
+| [**Subagents**](https://developers.openai.com/codex/subagents) | [`.codex/agents/<name>.toml`](.codex/agents/) | [![Best Practice](!/tags/best-practice.svg)](best-practice/codex-subagents.md) Custom agents, CSV batch processing, and multi-agent orchestration |
 | [**Multi-Agent**](https://developers.openai.com/codex/multi-agent/) | `/experimental` → Multi-agents | Spawn specialized sub-agents in parallel — fan-out work, collect results, and synthesize in one response |
 
 [![Orchestration Workflow](!/tags/orchestration-workflow-hd.svg)](orchestration-workflow/orchestration-workflow.md)
