@@ -22,7 +22,7 @@ practice makes codex perfect
 | [**MCP Servers**](https://developers.openai.com/codex/mcp) | `config.toml` → `[mcp_servers.*]` | [![Best Practice](!/tags/best-practice.svg)](best-practice/codex-mcp.md) [![Implemented](!/tags/implemented.svg)](.codex/config.toml) Model Context Protocol for external tools — plus Codex-as-MCP-server pattern |
 | [**Config**](https://developers.openai.com/codex/config-basic) | [`.codex/config.toml`](.codex/config.toml) | [![Best Practice](!/tags/best-practice.svg)](best-practice/codex-config.md) [![Implemented](!/tags/implemented.svg)](.codex/config.toml) TOML-based layered config system · [Profiles](https://developers.openai.com/codex/config-basic) · [Sandbox](https://developers.openai.com/codex/cli/features) · [Approval Policy](https://developers.openai.com/codex/cli/features) · [Override](https://developers.openai.com/codex/rules) |
 | [**AGENTS.md**](https://developers.openai.com/codex/guides/agents-md) | [`AGENTS.md`](AGENTS.md) | [![Best Practice](!/tags/best-practice.svg)](best-practice/codex-agents-md.md) Project-level context for Codex CLI — loaded from every directory up to repo root, capped at 32 KiB. Fallback: `CODEX.md` |
-| [**Hooks**](https://x.com/LLMJunky/status/2031582374064951414) ![beta](!/tags/beta.svg) | `.codex/hooks/` | [![Implemented](!/tags/implemented.svg)](https://github.com/shanraisshan/codex-cli-voice-hooks) User-defined shell scripts that run on specific events — notifications, sound feedback, and custom automation |
+| [**Hooks**](https://x.com/LLMJunky/status/2031582374064951414) ![beta](!/tags/beta.svg) | `.codex/hooks/` | [![Implemented](!/tags/implemented.svg)](https://github.com/shanraisshan/codex-cli-hooks) User-defined shell scripts that run on specific events — notifications, sound feedback, and custom automation |
 | **AI Terms** | | [![Best Practice](!/tags/best-practice.svg)](https://github.com/shanraisshan/claude-code-codex-cursor-gemini/blob/main/reports/ai-terms.md) Agentic Engineering · Context Engineering · Vibe Coding |
 | [**Best Practices**](https://developers.openai.com/codex/learn/best-practices) | | Official best practices · [Prompt Engineering](https://platform.openai.com/docs/guides/prompt-engineering) · [Codex Guides](https://developers.openai.com/codex/overview) |
 
@@ -85,7 +85,7 @@ codex
 ■ **Utilities (4)**
 - [iTerm](https://iterm2.com/) terminal instead of IDE (crash issue)
 - [Wispr Flow](https://wisprflow.ai) for voice prompting (10x productivity)
-- [codex-cli-voice-hooks](https://github.com/shanraisshan/codex-cli-voice-hooks) for Codex feedback
+- [codex-cli-hooks](https://github.com/shanraisshan/codex-cli-hooks) for Codex feedback
 - explore `config.toml` features like [profiles](https://developers.openai.com/codex/config-basic), [sandbox modes](https://developers.openai.com/codex/cli/features), and [MCP](https://developers.openai.com/codex/mcp) for a personalized experience
 
 ■ **Daily (2)**
@@ -107,7 +107,7 @@ codex
 
 ## Other Repos
 
-<a href="https://github.com/shanraisshan/codex-cli-voice-hooks"><img src="!/codex-speaking.svg" alt="Codex CLI Voice Hooks" width="40" height="40" align="center"></a> <a href="https://github.com/shanraisshan/codex-cli-voice-hooks"><strong>codex-cli-voice-hooks</strong></a> · <a href="https://github.com/shanraisshan/claude-code-best-practice"><img src="!/claude-jumping.svg" alt="Claude Code" width="40" height="40" align="center"></a> <a href="https://github.com/shanraisshan/claude-code-best-practice"><strong>claude-code-best-practice</strong></a> · <a href="https://github.com/shanraisshan/claude-code-voice-hooks"><img src="!/claude-speaking.svg" alt="Claude Code Voice Hooks" width="40" height="40" align="center"></a> <a href="https://github.com/shanraisshan/claude-code-voice-hooks"><strong>claude-code-voice-hooks</strong></a>
+<a href="https://github.com/shanraisshan/codex-cli-hooks"><img src="!/codex-speaking.svg" alt="Codex CLI Hooks" width="40" height="40" align="center"></a> <a href="https://github.com/shanraisshan/codex-cli-hooks"><strong>codex-cli-hooks</strong></a> · <a href="https://github.com/shanraisshan/claude-code-best-practice"><img src="!/claude-jumping.svg" alt="Claude Code" width="40" height="40" align="center"></a> <a href="https://github.com/shanraisshan/claude-code-best-practice"><strong>claude-code-best-practice</strong></a> · <a href="https://github.com/shanraisshan/claude-code-hooks"><img src="!/claude-speaking.svg" alt="Claude Code Hooks" width="40" height="40" align="center"></a> <a href="https://github.com/shanraisshan/claude-code-hooks"><strong>claude-code-hooks</strong></a>
 
 ---
 
