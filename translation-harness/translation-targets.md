@@ -1,72 +1,70 @@
-# 번역 대상 배치
+# 번역 대상 판정 규칙
 
-이 문서는 번역 대상 식별 전용 하네스 문서입니다. 번역 범위를 배치 단위로 고정하고, upstream 변경 후 어떤 파일을 재번역할지 판단하는 기준을 제공합니다.
+이 문서는 번역 대상 식별 전용 하네스 문서입니다. 고정 배치 목록을 유지하지 않고, 규칙 기반 점검으로 번역 후보를 판정합니다.
 
-## 원칙
+## 운영 모델
 
-- 배치 목록에 없는 파일은 번역하지 않습니다.
-- 번역 대상 확대는 먼저 이 문서를 수정한 뒤 진행합니다.
-- upstream 변경 후에는 전체를 다시 번역하지 않고, 변경된 번역 대상 파일만 재번역합니다.
+번역 운영은 두 단계로 나뉩니다.
 
-## 배치 목록
+1. 초기 전체 점검
+   저장소 전체를 스캔해 번역 후보, 제외 대상, 검토 필요 대상을 분류합니다.
+2. 이후 유지보수
+   `upstream/main` 변경 파일만 대상으로 다시 판정하고, 번역 규칙에 맞는 파일만 재작업합니다.
 
-### 배치 A: 진입점 문서
+## 기본 포함 규칙
 
-| 파일 | 설명 |
-|---|---|
-| `AGENTS.md` | Codex 진입점 문서 |
-| `README.md` | 저장소 개요 및 모범 사례 요약 |
+다음에 해당하는 마크다운 파일은 기본적으로 번역 후보입니다.
 
-### 배치 B: 모범 사례 문서
+- 저장소 진입점 문서: `AGENTS.md`, `README.md`
+- 가이드 문서: `best-practice/**/*.md`, `docs/**/*.md`, `orchestration-workflow/**/*.md`
+- 사람이 읽는 설명 비중이 큰 문서형 자산
 
-| 파일 | 설명 |
-|---|---|
-| `best-practice/codex-agents-md.md` | AGENTS.md 작성 가이드 |
-| `best-practice/codex-config.md` | config, profile, MCP 구성 |
-| `best-practice/codex-hooks.md` | hooks 운영 방식 |
-| `best-practice/codex-mcp.md` | MCP 서버 사용 가이드 |
-| `best-practice/codex-skills.md` | skills 모범 사례 |
-| `best-practice/codex-subagents.md` | subagents 모범 사례 |
+## 기본 제외 규칙
 
-### 배치 C: 참고 문서
+다음은 기본적으로 번역 대상에서 제외합니다.
 
-| 파일 | 설명 |
-|---|---|
-| `docs/SKILLS.md` | SKILL.md 형식과 discovery 규칙 |
-
-### 배치 D: 워크플로우 문서
-
-| 파일 | 설명 |
-|---|---|
-| `orchestration-workflow/orchestration-workflow.md` | weather 예제 워크플로우 설명 |
-
-## 번역 대상에서 제외
-
-다음은 기본적으로 번역하지 않습니다.
-
-- `.agents/skills/` 아래 실행용 스킬 자산
-- `.codex/agents/` 아래 TOML 에이전트 정의
-- `examples/` 아래 예시 설정 파일
+- `.codex/agents/*.toml` 같은 설정 및 실행 자산
+- `examples/` 아래의 TOML, YAML, JSON 예시 설정 파일
 - 이미지, SVG, GIF, 오디오 등 비텍스트 자산
-- `translation-harness/`, `reports/` 아래 운영 자산
+- `reports/` 아래 운영 리포트 파일
+- `translation-harness/` 아래 하네스 운영 문서
 - `.originals/` 아래 임시 스냅샷 파일
 
-운영 자산은 한국어로 관리할 수 있지만, 그것은 번역 결과물이 아니라 하네스 유지보수 작업으로 취급합니다. `.originals/`는 유지보수 자산도 아니며 검증을 위한 임시 작업 디렉토리입니다.
+## 조건부 포함 규칙
 
-## upstream 변경 후 식별 절차
+다음은 자동 포함하지 않고 검토 후 결정합니다.
+
+- `.agents/skills/**/SKILL.md`
+  실행 자산이지만 사람이 읽는 설명이 많고 한국어 운영에 실질적 도움이 되면 번역 후보로 승격할 수 있습니다.
+- `.claude/**` 아래 문서
+  Codex 운영과 직접 관련 있을 때만 포함합니다.
+
+## 신규 구조 대응 규칙
+
+새 디렉토리나 새 문서가 생기면 다음 순서로 판정합니다.
+
+1. 마크다운 산문 문서인지 확인합니다.
+2. 실행 식별자 중심 자산인지, 사람이 읽는 설명 문서인지 구분합니다.
+3. 설명 문서라면 번역 후보로 분류합니다.
+4. 판단이 애매하면 검토 필요 대상으로 남기고, 규칙을 먼저 갱신합니다.
+
+## upstream 변경 후 판정 절차
 
 1. `git fetch upstream`
-2. `origin/main..upstream/main` 또는 `main..upstream/main` 범위의 변경 파일 목록 확인
-3. 배치 목록과 교집합인 파일만 추출
-4. 해당 파일을 `reports/retranslation-needed.md`에 기록
-5. `.originals/`에 기준 원문 스냅샷을 임시 저장
-6. 해당 배치만 재번역
-7. 역번역 검증 후 `.originals/` 정리
+2. `origin/main..upstream/main` 또는 `main..upstream/main`의 변경 파일 목록을 구합니다.
+3. 변경 파일 각각에 대해 위 포함/제외 규칙을 적용합니다.
+4. 번역 후보만 `reports/retranslation-needed.md`에 기록합니다.
+5. 해당 파일만 재번역하고 검증합니다.
+
+## 검증 및 재검증 규칙
+
+- 1차 검증은 이번에 처리한 파일 전체에 수행합니다.
+- `WARN/ERROR`가 나온 파일만 수정 대상으로 분리합니다.
+- 수정 후에는 실패했던 파일만 다시 검증합니다.
+- 공통 용어 사전, 공통 링크 구조, 공통 템플릿을 바꾼 경우에만 범위를 넓혀 다시 검증합니다.
 
 ## 운영 메모
 
-- 배치 A부터 순서대로 진행합니다.
-- 번역 완료 후 `reports/translation-progress.md` 상태를 갱신합니다.
-- 재번역은 전체 진행률과 별도로 `reports/retranslation-needed.md`에서 관리합니다.
-- 배치 검증 후 수정이 필요하면 실패한 파일만 다시 검증합니다.
-- 공통 규칙 변경처럼 영향 범위가 넓은 수정일 때만 재검증 범위를 확대합니다.
+- 하네스 문서는 현재 기준만 유지하고, 과거 처리 이력은 git 로그에 맡깁니다.
+- 진행상황 파일에는 현재 완료 상태와 최근 처리 파일만 남깁니다.
+- 배치 번호는 더 이상 운영 기준이 아니며, 필요할 때만 임시 작업 묶음으로 사용할 수 있습니다.
