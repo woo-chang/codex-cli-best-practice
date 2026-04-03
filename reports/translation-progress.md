@@ -5,7 +5,7 @@
 | A | 진입점 문서 (`AGENTS.md`, `README.md`) | 2 | 완료 | 2026-04-03 |
 | B | 모범 사례 문서 (`best-practice/*.md`) | 6 | 완료 | 2026-04-04 |
 | C | 참고 문서 (`docs/*.md`) | 1 | 완료 | 2026-04-04 |
-| D | 워크플로우 문서 (`orchestration-workflow/*.md`) | 1 | 대기 | - |
+| D | 워크플로우 문서 (`orchestration-workflow/*.md`) | 1 | 완료 | 2026-04-04 |
 | E | 번역 하네스 문서 및 리포트 | 6 | 완료 | 2026-04-03 |
 
 ## 메모

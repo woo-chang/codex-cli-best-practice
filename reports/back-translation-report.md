@@ -21,6 +21,7 @@
 | `best-practice/codex-skills.md` | PASS | 0 | 0 | 10 | skill 패턴, frontmatter 지침, 안티패턴 의미 유지 |
 | `best-practice/codex-subagents.md` | PASS | 0 | 0 | 18 | subagent 사용 조건, 승인 상속, CSV 배치 규칙 의미 유지 |
 | `docs/SKILLS.md` | PASS | 0 | 0 | 12 | SKILL 형식, 필드 정의, 탐색 경로, 패턴 설명 의미 유지 |
+| `orchestration-workflow/orchestration-workflow.md` | PASS | 0 | 0 | 11 | Agent → Skill 패턴, 제약 설명, 실행 흐름 의미 유지 |
 
 ## 배치 A 재검토
 
@@ -63,3 +64,12 @@
 - 결과: PASS
 - 판단 근거: 필드 정의, 우선순위 규칙, `project > user > built-in` 탐색 순서, `user-invocable`, `context: fork` 같은 제약과 식별자가 유지됨
 - 특이사항: frontmatter key, 모델명, skill 이름, 명령 예시는 원문 식별자 보존을 우선함
+
+## 배치 D 재검토
+
+### `orchestration-workflow/orchestration-workflow.md`
+
+- 비교 범위: 시스템 개요, 출력 파일, 참고 노트, 컴포넌트 요약, 실행 흐름, 설계 원칙, Claude Code 비교 표
+- 결과: PASS
+- 판단 근거: Agent → Skill 패턴, custom commands 미지원, 사용자 선호를 프롬프트에서 직접 지정해야 한다는 제약, `developer_instructions` 인라인 구조가 모두 유지됨
+- 특이사항: `Agent`, `Skill`, `developer_instructions`, `Command`, `AskUserQuestion` 같은 시스템 식별자는 문맥상 영어 보존
