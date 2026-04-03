@@ -23,10 +23,12 @@
 - `.agents/skills/translation-rules/SKILL.md`: 번역 경계와 용어 규칙
 - `.agents/skills/validation-rules/SKILL.md`: 구조 검증 체크리스트
 - `.agents/skills/sync-upstream/SKILL.md`: `main`과 `ko` 동기화 절차
+- `.agents/skills/commit-rules/SKILL.md`: 한글 커밋 메시지와 커밋 전 검증 규칙
 - `.originals/`: 원문 스냅샷
 - `reports/translation-progress.md`: 배치 진행 현황
 - `reports/back-translation-report.md`: 역번역 의미 검증 결과
 - `reports/retranslation-needed.md`: upstream 동기화 후 재번역 필요 목록
+- `translation-harness/commit-policy.md`: 커밋 정책 요약
 
 ## 운영 원칙
 
@@ -37,6 +39,7 @@
 5. 번역 완료 후 구조 검증과 역번역 검증을 거쳐야 배치를 완료로 표시할 수 있습니다.
 6. 기존 진입점 파일은 최소 수정 원칙을 따릅니다. 특히 `AGENTS.md`에는 요약 포인터만 두고, 상세 규칙은 이 디렉토리와 스킬 파일로 분리합니다.
 7. upstream 동기화 중 충돌이 발생하면 로컬 번역보다 upstream 영어 원문을 우선 수용하고, 해당 파일을 재번역 대상으로 돌립니다.
+8. 커밋은 `영어 접두사 + 한글 요약` 형식을 사용하고, upstream 동기화 커밋과 번역 커밋을 분리합니다.
 
 ## 권장 루프
 

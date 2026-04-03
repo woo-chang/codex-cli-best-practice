@@ -110,6 +110,7 @@ MCP servers are configured under `[mcp_servers.*]` in `.codex/config.toml`. Curr
 - `best-practice/codex-subagents.md`: Subagents guide
 - `docs/SKILLS.md`: Skills system reference
 - `translation-harness/README.md`: 한국어 번역 워크플로우, 범위, 검증 루프
+- `translation-harness/commit-policy.md`: 한글 커밋 메시지와 커밋 전 검증 규칙
 - `orchestration-workflow/orchestration-workflow.md`: Weather system flow diagram
 - `examples/`: Example profile configs and CI/CD setup
 
@@ -121,5 +122,6 @@ MCP servers are configured under `[mcp_servers.*]` in `.codex/config.toml`. Curr
 - `main`은 upstream 정렬용 영어 기준 브랜치로 유지합니다
 - `ko`에서만 번역 작업을 수행합니다
 - 상세 규칙은 `translation-harness/README.md`와 `.agents/skills/*` 하네스 파일에서 확인합니다
+- 커밋 규칙은 `translation-harness/commit-policy.md`와 `.agents/skills/commit-rules/SKILL.md`를 따릅니다
 
 이 파일에는 번역 하네스의 세부 규칙을 복제하지 않습니다.
