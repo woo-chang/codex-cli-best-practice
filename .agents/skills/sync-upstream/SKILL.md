@@ -11,6 +11,7 @@ fork를 upstream 기준으로 갱신할 때 이 절차를 사용합니다.
 ## 브랜치 의도
 
 - `main`은 영어 upstream 정렬 브랜치로 유지합니다
+- `main`은 fast-forward 후 `origin/main`에도 push 해 fork의 기준 원문 브랜치를 최신 상태로 유지합니다
 - `ko`에는 한국어 번역 작업만 둡니다
 
 ## 동기화 절차
@@ -32,6 +33,7 @@ fork를 upstream 기준으로 갱신할 때 이 절차를 사용합니다.
 - 재번역할 파일의 `.originals/` 임시 스냅샷을 갱신합니다
 - 이후 번역 작업은 `ko`에서만 계속합니다
 - 역번역 검증이 끝나면 `.originals/`를 비웁니다
+- 기준 diff는 `main..upstream/main` 또는 `origin/main..upstream/main` 중 현재 운영 상태에 맞는 범위를 사용하되, 둘이 어긋나지 않도록 `origin/main`을 최신으로 유지합니다
 
 ## 충돌 처리 원칙
 

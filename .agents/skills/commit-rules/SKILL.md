@@ -40,6 +40,7 @@ user-invocable: false
 - 번역 하네스 구조 추가는 한 번에 커밋할 수 있습니다.
 - 번역 작업은 가능한 한 배치 단위로 커밋합니다.
 - upstream 동기화는 번역과 섞지 않고 별도 커밋으로 남깁니다.
+- `main`을 fast-forward 한 뒤에는 `origin/main` push까지 완료한 후 `ko` 작업으로 넘어갑니다.
 - 역번역 검증 후 수정은 번역 커밋과 분리하는 편이 좋습니다.
 
 ## 커밋 전 검증
@@ -53,6 +54,7 @@ user-invocable: false
 5. 프론트매터와 TOML/JSON/YAML 키가 영어로 유지되는지 확인합니다.
 6. 상대 링크와 이미지 경로가 깨지지 않았는지 확인합니다.
 7. 번역 커밋이라면 `reports/`와 역번역 검증 결과가 갱신됐는지 확인하고, `.originals/`가 staging되지 않았는지 확인합니다.
+8. 유지보수 루프 직전이라면 `main`과 `origin/main`이 upstream 기준으로 최신인지 확인합니다.
 
 ## 금지 사항
 

@@ -11,6 +11,8 @@
 
 번역 관련 변경은 모두 `ko`에서만 수행합니다.
 
+`main`은 로컬 기준점으로만 두지 않고, `origin/main`에도 항상 push해 fork의 원문 기준 브랜치를 최신 상태로 유지합니다.
+
 ## 기준 원문
 
 - upstream 영어 문서가 기준 원문입니다.
@@ -47,16 +49,17 @@
 ## 권장 루프
 
 1. `main`을 `upstream` 기준으로 동기화합니다.
-2. `main`을 `ko`에 병합합니다.
-3. `translation-targets` 규칙으로 이번에 처리할 파일을 판정합니다.
-4. upstream 변경이 있는 경우 번역 후보만 `reports/retranslation-needed.md`에 기록합니다.
-5. 원문 스냅샷을 `.originals/`에 임시 저장합니다.
-6. `ko`에서 선택한 파일 집합을 번역합니다.
-7. `validation-rules` 기준으로 이번에 처리한 파일 전체 1차 검증을 수행합니다.
-8. `WARN/ERROR`가 나온 파일만 수정하고, 실패 파일만 재검증합니다.
-9. 모든 파일이 허용 가능한 상태가 되면 역번역 검증 결과를 `reports/back-translation-report.md`에 기록합니다.
-10. `reports/translation-progress.md`를 갱신합니다.
-11. 역번역 검증이 끝나면 `.originals/` 스냅샷을 제거합니다.
+2. fast-forward된 `main`을 `origin/main`에 push 합니다.
+3. `main`을 `ko`에 병합합니다.
+4. `translation-targets` 규칙으로 이번에 처리할 파일을 판정합니다.
+5. upstream 변경이 있는 경우 번역 후보만 `reports/retranslation-needed.md`에 기록합니다.
+6. 원문 스냅샷을 `.originals/`에 임시 저장합니다.
+7. `ko`에서 선택한 파일 집합을 번역합니다.
+8. `validation-rules` 기준으로 이번에 처리한 파일 전체 1차 검증을 수행합니다.
+9. `WARN/ERROR`가 나온 파일만 수정하고, 실패 파일만 재검증합니다.
+10. 모든 파일이 허용 가능한 상태가 되면 역번역 검증 결과를 `reports/back-translation-report.md`에 기록합니다.
+11. `reports/translation-progress.md`를 갱신합니다.
+12. 역번역 검증이 끝나면 `.originals/` 스냅샷을 제거합니다.
 
 ## 현재 번역 범위
 
@@ -69,5 +72,6 @@
 - 기존 upstream 파일 수정은 최소화합니다.
 - 새 운영 규칙은 가능하면 `translation-harness/`, `.agents/skills/`, `reports/` 아래에 둡니다.
 - `AGENTS.md`는 진입점 역할만 하며 상세 운영 규칙을 직접 담지 않습니다.
+- `main`은 upstream 영어 원문 기준 브랜치이므로 로컬 fast-forward 후 `origin/main`에도 즉시 push 합니다.
 - upstream 변경과 번역 변경이 충돌하면 upstream 영어 내용을 먼저 반영하고, 이후 `ko`에서 다시 번역합니다.
 - `.originals/`는 임시 작업 디렉토리이므로 커밋하지 않고, 검증이 끝나면 비웁니다.
