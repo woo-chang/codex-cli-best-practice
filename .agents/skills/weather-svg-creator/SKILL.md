@@ -6,19 +6,19 @@ argument-hint: "[temperature]"
 
 # Weather SVG Creator Skill
 
-This skill creates an SVG weather card from provided temperature data.
+이 스킬은 전달받은 온도 데이터를 바탕으로 SVG 날씨 카드를 생성합니다.
 
-## Task
+## 작업
 
-Create an SVG weather card displaying the temperature for a given city and write it to the output files.
+지정된 도시의 온도를 표시하는 SVG 날씨 카드를 만들고 결과를 출력 파일에 작성합니다.
 
-## Instructions
+## 지침
 
-You will receive the temperature value, unit (Celsius or Fahrenheit), and city name from the calling context.
+호출 컨텍스트에서 온도 값, 단위(섭씨 또는 화씨), 도시 이름을 전달받습니다.
 
-### 1. Create SVG Weather Card
+### 1. SVG 날씨 카드 생성
 
-Generate a clean SVG weather card with the following structure:
+아래 구조를 기반으로 깔끔한 SVG 날씨 카드를 생성합니다.
 
 ```svg
 <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 400 200" width="400" height="200">
@@ -30,13 +30,13 @@ Generate a clean SVG weather card with the following structure:
 </svg>
 ```
 
-Replace `[value]`, `[C/F]`, `[City Name]` with actual values from the input.
+`[value]`, `[C/F]`, `[City Name]`을 입력으로 받은 실제 값으로 바꿉니다.
 
-### 2. Write Output Files
+### 2. 출력 파일 작성
 
-Write the SVG content to `orchestration-workflow/weather.svg`.
+SVG 내용을 `orchestration-workflow/weather.svg`에 작성합니다.
 
-Also write a markdown summary to `orchestration-workflow/output.md`:
+또한 `orchestration-workflow/output.md`에 마크다운 요약을 작성합니다.
 
 ```markdown
 # Weather Report
@@ -50,27 +50,27 @@ Also write a markdown summary to `orchestration-workflow/output.md`:
 > Weather data provided by [Open-Meteo API](https://open-meteo.com/)
 ```
 
-- Create the `orchestration-workflow/` directory if it does not exist
-- Overwrite any existing content
+- `orchestration-workflow/` 디렉토리가 없으면 생성합니다
+- 기존 내용이 있으면 덮어씁니다
 
-## Expected Input
+## 예상 입력
 
-Temperature value, unit, and city from the calling agent:
+호출한 에이전트가 제공하는 온도 값, 단위, 도시:
 ```
 Temperature: [X]°[C/F]
 City: [City Name]
 Unit: [Celsius/Fahrenheit]
 ```
 
-## Expected Output
+## 예상 출력
 
-Two files written:
-- `orchestration-workflow/weather.svg` — SVG weather card
-- `orchestration-workflow/output.md` — Markdown report embedding the SVG
+다음 두 파일이 작성됩니다.
+- `orchestration-workflow/weather.svg` — SVG 날씨 카드
+- `orchestration-workflow/output.md` — SVG를 포함하는 마크다운 보고서
 
-## Notes
+## 참고 사항
 
-- Use the exact temperature value and unit provided — do not re-fetch or modify the data
-- Keep the SVG design minimal and clean
-- Include a timestamp so the report is traceable
-- Output files go in the `orchestration-workflow/` directory
+- 제공받은 온도 값과 단위를 그대로 사용합니다. 데이터를 다시 가져오거나 수정하지 않습니다
+- SVG 디자인은 단순하고 깔끔하게 유지합니다
+- 보고서를 추적할 수 있도록 타임스탬프를 포함합니다
+- 출력 파일은 `orchestration-workflow/` 디렉토리에 생성합니다
