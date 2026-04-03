@@ -1,71 +1,71 @@
 # HOOKS-README
-contains all the details, scripts, and instructions for the hooks
+훅에 대한 상세 정보, 스크립트, 사용 지침을 정리한 문서입니다.
 
-## Hook Events Overview - [Official 22 Hooks](https://code.claude.com/docs/en/hooks)
-Claude Code provides several hook events that run at different points in the workflow:
+## Hook 이벤트 개요 - [공식 22개 Hook](https://code.claude.com/docs/en/hooks)
+Claude Code는 워크플로우의 여러 시점에서 실행되는 다양한 hook 이벤트를 제공합니다.
 
-| # | Hook | Description | Options |
+| # | Hook | 설명 | 옵션 |
 |:-:|------|-------------|---------|
-| 1 | `PreToolUse` | Runs before tool calls (can block them) | `async`, `timeout: 5000`, `tool_use_id` |
-| 2 | `PermissionRequest` | Runs when Claude Code requests permission from the user | `async`, `timeout: 5000`, `permission_suggestions` |
-| 3 | `PostToolUse` | Runs after tool calls complete successfully | `async`, `timeout: 5000`, `tool_response`, `tool_use_id` |
-| 4 | `PostToolUseFailure` | Runs after tool calls fail | `async`, `timeout: 5000`, `error`, `is_interrupt`, `tool_use_id` |
-| 5 | `UserPromptSubmit` | Runs when the user submits a prompt, before Claude processes it | `async`, `timeout: 5000`, `prompt` |
-| 6 | `Notification` | Runs when Claude Code sends notifications | `async`, `timeout: 5000`, `notification_type`, `message`, `title` |
-| 7 | `Stop` | Runs when Claude Code finishes responding | `async`, `timeout: 5000`, `last_assistant_message`, `stop_hook_active` |
-| 8 | `SubagentStart` | Runs when subagent tasks start | `async`, `timeout: 5000`, `agent_id`, `agent_type` |
-| 9 | `SubagentStop` | Runs when subagent tasks complete | `async`, `timeout: 5000`, `agent_id`, `agent_type`, `last_assistant_message`, `agent_transcript_path`, `stop_hook_active` |
-| 10 | `PreCompact` | Runs before Claude Code is about to run a compact operation | `async`, `timeout: 5000`, `once`, `trigger`, `custom_instructions` |
-| 11 | `PostCompact` | Runs after Claude Code completes a compact operation | `async`, `timeout: 5000`, `trigger`, `compact_summary` |
-| 12 | `SessionStart` | Runs when Claude Code starts a new session or resumes an existing session | `async`, `timeout: 5000`, `once`, `agent_type`, `model`, `source` |
-| 13 | `SessionEnd` | Runs when Claude Code session ends | `async`, `timeout: 5000`, `once`, `reason` |
-| 14 | `Setup` | Runs when Claude Code runs the /setup command for project initialization | `async`, `timeout: 30000` |
-| 15 | `TeammateIdle` | Runs when a teammate agent becomes idle (experimental agent teams) | `async`, `timeout: 5000`, `teammate_name`, `team_name` |
-| 16 | `TaskCompleted` | Runs when a background task completes (experimental agent teams) | `async`, `timeout: 5000`, `task_id`, `task_subject`, `task_description`, `teammate_name`, `team_name` |
-| 17 | `ConfigChange` | Runs when a configuration file changes during a session | `async`, `timeout: 5000`, `file_path`, `source` |
-| 18 | `WorktreeCreate` | Runs when agent worktree isolation creates worktrees for custom VCS setup | `async`, `timeout: 5000`, `name` |
-| 19 | `WorktreeRemove` | Runs when agent worktree isolation removes worktrees for custom VCS teardown | `async`, `timeout: 5000`, `worktree_path` |
-| 20 | `InstructionsLoaded` | Runs when CLAUDE.md or `.claude/rules/*.md` files are loaded into context | `async`, `timeout: 5000`, `file_path`, `memory_type`, `load_reason`, `globs`, `trigger_file_path`, `parent_file_path` |
-| 21 | `Elicitation` | Runs when an MCP server requests user input during a tool call | `async`, `timeout: 5000`, `mcp_server_name`, `message`, `mode`, `url`, `elicitation_id`, `requested_schema` |
-| 22 | `ElicitationResult` | Runs after a user responds to an MCP elicitation, before the response is sent back to the server | `async`, `timeout: 5000`, `mcp_server_name`, `action`, `content`, `mode`, `elicitation_id` |
+| 1 | `PreToolUse` | 도구 호출 전에 실행됨. 호출을 차단할 수 있음 | `async`, `timeout: 5000`, `tool_use_id` |
+| 2 | `PermissionRequest` | Claude Code가 사용자에게 권한을 요청할 때 실행됨 | `async`, `timeout: 5000`, `permission_suggestions` |
+| 3 | `PostToolUse` | 도구 호출이 성공적으로 끝난 뒤 실행됨 | `async`, `timeout: 5000`, `tool_response`, `tool_use_id` |
+| 4 | `PostToolUseFailure` | 도구 호출이 실패한 뒤 실행됨 | `async`, `timeout: 5000`, `error`, `is_interrupt`, `tool_use_id` |
+| 5 | `UserPromptSubmit` | 사용자가 프롬프트를 제출한 뒤, Claude가 처리하기 전에 실행됨 | `async`, `timeout: 5000`, `prompt` |
+| 6 | `Notification` | Claude Code가 알림을 보낼 때 실행됨 | `async`, `timeout: 5000`, `notification_type`, `message`, `title` |
+| 7 | `Stop` | Claude Code의 응답이 끝날 때 실행됨 | `async`, `timeout: 5000`, `last_assistant_message`, `stop_hook_active` |
+| 8 | `SubagentStart` | subagent 작업이 시작될 때 실행됨 | `async`, `timeout: 5000`, `agent_id`, `agent_type` |
+| 9 | `SubagentStop` | subagent 작업이 끝날 때 실행됨 | `async`, `timeout: 5000`, `agent_id`, `agent_type`, `last_assistant_message`, `agent_transcript_path`, `stop_hook_active` |
+| 10 | `PreCompact` | Claude Code가 compact 작업을 시작하기 직전에 실행됨 | `async`, `timeout: 5000`, `once`, `trigger`, `custom_instructions` |
+| 11 | `PostCompact` | Claude Code가 compact 작업을 끝낸 뒤 실행됨 | `async`, `timeout: 5000`, `trigger`, `compact_summary` |
+| 12 | `SessionStart` | Claude Code가 새 세션을 시작하거나 기존 세션을 재개할 때 실행됨 | `async`, `timeout: 5000`, `once`, `agent_type`, `model`, `source` |
+| 13 | `SessionEnd` | Claude Code 세션이 종료될 때 실행됨 | `async`, `timeout: 5000`, `once`, `reason` |
+| 14 | `Setup` | Claude Code가 프로젝트 초기화를 위해 `/setup` 명령을 실행할 때 동작함 | `async`, `timeout: 30000` |
+| 15 | `TeammateIdle` | 팀 동료 agent가 idle 상태가 될 때 실행됨. experimental agent teams 필요 | `async`, `timeout: 5000`, `teammate_name`, `team_name` |
+| 16 | `TaskCompleted` | 백그라운드 작업이 끝날 때 실행됨. experimental agent teams 필요 | `async`, `timeout: 5000`, `task_id`, `task_subject`, `task_description`, `teammate_name`, `team_name` |
+| 17 | `ConfigChange` | 세션 중 설정 파일이 변경되면 실행됨 | `async`, `timeout: 5000`, `file_path`, `source` |
+| 18 | `WorktreeCreate` | agent worktree isolation이 사용자 정의 VCS 설정용 worktree를 만들 때 실행됨 | `async`, `timeout: 5000`, `name` |
+| 19 | `WorktreeRemove` | agent worktree isolation이 사용자 정의 VCS 정리용 worktree를 제거할 때 실행됨 | `async`, `timeout: 5000`, `worktree_path` |
+| 20 | `InstructionsLoaded` | `CLAUDE.md` 또는 `.claude/rules/*.md` 파일이 컨텍스트에 로드될 때 실행됨 | `async`, `timeout: 5000`, `file_path`, `memory_type`, `load_reason`, `globs`, `trigger_file_path`, `parent_file_path` |
+| 21 | `Elicitation` | MCP 서버가 도구 호출 중 사용자 입력을 요청할 때 실행됨 | `async`, `timeout: 5000`, `mcp_server_name`, `message`, `mode`, `url`, `elicitation_id`, `requested_schema` |
+| 22 | `ElicitationResult` | 사용자가 MCP elicitation에 응답한 뒤, 결과가 서버로 전송되기 전에 실행됨 | `async`, `timeout: 5000`, `mcp_server_name`, `action`, `content`, `mode`, `elicitation_id` |
 
-> **Note:** Hooks 15-16 (`TeammateIdle` and `TaskCompleted`) require the experimental agent teams feature. Set `CLAUDE_CODE_EXPERIMENTAL_AGENT_TEAMS=1` when launching Claude Code to enable them.
+> **참고:** Hook 15-16인 `TeammateIdle`, `TaskCompleted`는 experimental agent teams 기능이 필요합니다. Claude Code 실행 시 `CLAUDE_CODE_EXPERIMENTAL_AGENT_TEAMS=1`을 설정해야 활성화됩니다.
 
-### Not in Official Docs
+### 공식 문서에 없는 항목
 
-The following items exist in the [Claude Code Changelog](https://github.com/anthropics/claude-code/blob/main/CHANGELOG.md) but are **not listed** in the [Official Hooks Reference](https://code.claude.com/docs/en/hooks):
+아래 항목은 [Claude Code Changelog](https://github.com/anthropics/claude-code/blob/main/CHANGELOG.md)에는 있지만 [공식 Hooks Reference](https://code.claude.com/docs/en/hooks)에는 **나열되어 있지 않습니다**.
 
-| Item | Added In | Changelog Reference | Notes |
+| 항목 | 추가 버전 | Changelog 참고 | 비고 |
 |------|----------|-------------------|-------|
-| `Setup` hook | [v2.1.10](https://github.com/anthropics/claude-code/blob/main/CHANGELOG.md#2110) | "Added new Setup hook event that can be triggered via `--init`, `--init-only`, or `--maintenance` CLI flags for repository setup and maintenance operations" | Not listed in official hooks reference page (21 hooks listed, Setup excluded) |
-| Agent frontmatter hooks | [v2.1.0](https://github.com/anthropics/claude-code/blob/main/CHANGELOG.md#210) | "Added hooks support to agent frontmatter, allowing agents to define PreToolUse, PostToolUse, and Stop hooks scoped to the agent's lifecycle" | Changelog only mentions 3 hooks, but testing confirms **6 hooks** actually fire in agent sessions: PreToolUse, PostToolUse, PermissionRequest, PostToolUseFailure, Stop, SubagentStop. Not all 16 hooks are supported. |
+| `Setup` hook | [v2.1.10](https://github.com/anthropics/claude-code/blob/main/CHANGELOG.md#2110) | "Added new Setup hook event that can be triggered via `--init`, `--init-only`, or `--maintenance` CLI flags for repository setup and maintenance operations" | 공식 hooks reference 페이지에는 없음. 21개 hook만 나열되고 Setup은 제외됨 |
+| Agent frontmatter hooks | [v2.1.0](https://github.com/anthropics/claude-code/blob/main/CHANGELOG.md#210) | "Added hooks support to agent frontmatter, allowing agents to define PreToolUse, PostToolUse, and Stop hooks scoped to the agent's lifecycle" | Changelog에는 3개 hook만 언급되지만, 테스트 결과 agent 세션에서는 실제로 **6개 hook**이 동작함: PreToolUse, PostToolUse, PermissionRequest, PostToolUseFailure, Stop, SubagentStop. 16개 전체가 지원되지는 않음 |
 
-## Prerequisites
+## 사전 요구 사항
 
-Before using hooks, ensure you have **Python 3** installed on your system.
+hook을 사용하기 전에 시스템에 **Python 3**가 설치되어 있는지 확인합니다.
 
-### Required Software
+### 필요한 소프트웨어
 
-#### All Platforms (Windows, macOS, Linux)
-- **Python 3**: Required for running the hook scripts
-- Verify installation: `python3 --version`
+#### 모든 플랫폼(Windows, macOS, Linux)
+- **Python 3**: hook 스크립트 실행에 필요
+- 설치 확인: `python3 --version`
 
-**Installation Instructions:**
-- **Windows**: Download from [python.org](https://www.python.org/downloads/) or install via `winget install Python.Python.3`
-- **macOS**: Install via `brew install python3` (requires [Homebrew](https://brew.sh/))
-- **Linux**: Install via `sudo apt install python3` (Ubuntu/Debian) or `sudo yum install python3` (RHEL/CentOS)
+**설치 방법:**
+- **Windows**: [python.org](https://www.python.org/downloads/)에서 다운로드하거나 `winget install Python.Python.3`로 설치
+- **macOS**: `brew install python3`로 설치. [Homebrew](https://brew.sh/) 필요
+- **Linux**: `sudo apt install python3`(Ubuntu/Debian) 또는 `sudo yum install python3`(RHEL/CentOS)로 설치
 
-### Audio Players (Optional - Automatically Detected)
+### 오디오 플레이어(선택 사항, 자동 감지)
 
-The hook scripts automatically detect and use the appropriate audio player for your platform:
+hook 스크립트는 플랫폼에 맞는 오디오 플레이어를 자동으로 감지해 사용합니다.
 
-- **macOS**: Uses `afplay` (built-in, no installation needed)
-- **Linux**: Uses `paplay` from `pulseaudio-utils` - install via `sudo apt install pulseaudio-utils`
-- **Windows**: Uses built-in `winsound` module (included with Python)
+- **macOS**: `afplay` 사용. 기본 내장, 설치 불필요
+- **Linux**: `pulseaudio-utils`의 `paplay` 사용. `sudo apt install pulseaudio-utils`로 설치
+- **Windows**: Python에 포함된 기본 `winsound` 모듈 사용
 
-### How Hooks Are Executed
+### Hook 실행 방식
 
-The hooks are configured in `.claude/settings.json` to run directly with Python 3:
+이 프로젝트의 hook은 `.claude/settings.json`에서 Python 3로 직접 실행되도록 설정됩니다.
 
 ```json
 {
@@ -74,39 +74,39 @@ The hooks are configured in `.claude/settings.json` to run directly with Python 
 }
 ```
 
-## Configuring Hooks (Enable/Disable)
+## Hook 설정(활성화/비활성화)
 
-Hooks can be easily enabled or disabled at both the global and individual levels.
+hook은 전체 단위와 개별 단위 모두에서 쉽게 활성화하거나 비활성화할 수 있습니다.
 
-### Disable All Hooks at Once
+### 모든 Hook 한 번에 비활성화
 
-Edit `.claude/settings.local.json` and set:
+`.claude/settings.local.json`을 수정해 다음과 같이 설정합니다.
 ```json
 {
   "disableAllHooks": true
 }
 ```
 
-**Note:** The `.claude/settings.local.json` file is git-ignored, so each user can configure their own hook preferences without affecting the team's shared settings in `.claude/settings.json`.
+**참고:** `.claude/settings.local.json` 파일은 git ignore 대상이므로, 각 사용자는 팀 공용 설정인 `.claude/settings.json`에 영향을 주지 않고 자신의 hook 설정을 조정할 수 있습니다.
 
-> **Managed Settings:** If an administrator has configured hooks through managed policy settings, `disableAllHooks` set in user, project, or local settings cannot disable those managed hooks (fixed in v2.1.49).
+> **Managed Settings:** 관리자가 managed policy settings를 통해 hook을 구성한 경우, user/project/local settings에 설정한 `disableAllHooks`로는 해당 managed hook을 비활성화할 수 없습니다. 이 동작은 v2.1.49에서 정리되었습니다.
 
-### Disable Individual Hooks
+### 개별 Hook 비활성화
 
-For granular control, you can disable specific hooks by editing the hooks configuration files.
+세부 제어가 필요하면 hook 설정 파일을 수정해 특정 hook만 비활성화할 수 있습니다.
 
-#### Configuration Files
+#### 설정 파일
 
-There are two configuration files for managing individual hooks:
+개별 hook 관리를 위한 설정 파일은 두 개입니다.
 
-1. **`.claude/hooks/config/hooks-config.json`** - The shared/default configuration that is committed to git
-2. **`.claude/hooks/config/hooks-config.local.json`** - Your personal overrides (git-ignored)
+1. **`.claude/hooks/config/hooks-config.json`** - git에 커밋되는 공용 기본 설정
+2. **`.claude/hooks/config/hooks-config.local.json`** - 개인 오버라이드용 설정. git ignore 대상
 
-The local config file (`.local.json`) takes precedence over the shared config, allowing each developer to customize their hook behavior without affecting the team.
+로컬 설정 파일인 `.local.json`이 공용 설정보다 우선하며, 각 개발자는 팀 설정에 영향을 주지 않고 자신의 hook 동작을 조정할 수 있습니다.
 
-#### Shared Configuration
+#### 공용 설정
 
-Edit `.claude/hooks/config/hooks-config.json` for team-wide defaults:
+팀 공용 기본값은 `.claude/hooks/config/hooks-config.json`에서 설정합니다.
 
 ```json
 {
@@ -136,12 +136,12 @@ Edit `.claude/hooks/config/hooks-config.json` for team-wide defaults:
 }
 ```
 
-**Configuration Options:**
-- `disableLogging`: Set to `true` to disable logging hook events to `.claude/hooks/logs/hooks-log.jsonl` (useful to prevent log file growth)
+**설정 옵션:**
+- `disableLogging`: `true`로 설정하면 `.claude/hooks/logs/hooks-log.jsonl`에 hook 이벤트를 기록하지 않습니다. 로그 파일이 커지는 것을 막는 데 유용합니다
 
-#### Local Configuration (Personal Overrides)
+#### 로컬 설정(개인 오버라이드)
 
-Create or edit `.claude/hooks/config/hooks-config.local.json` for personal preferences:
+개인 설정은 `.claude/hooks/config/hooks-config.local.json`을 생성하거나 수정해 적용합니다.
 
 ```json
 {
@@ -151,35 +151,35 @@ Create or edit `.claude/hooks/config/hooks-config.local.json` for personal prefe
 }
 ```
 
-In this example, logging is disabled, and the PostToolUse and SessionStart hooks are overridden locally. All other hooks will use the shared configuration values.
+위 예시에서는 logging이 비활성화되고, PostToolUse와 SessionStart hook만 로컬에서 오버라이드됩니다. 나머지 hook은 공용 설정값을 그대로 사용합니다.
 
-**Note:** Individual hook toggles are checked by the hook script (`.claude/hooks/scripts/hooks.py`). Local settings override shared settings, and if a hook is disabled, the script exits silently without playing any sounds or executing hook logic.
+**참고:** 개별 hook 토글은 hook 스크립트인 `.claude/hooks/scripts/hooks.py`에서 확인합니다. 로컬 설정이 공용 설정보다 우선하며, 어떤 hook이 비활성화되어 있으면 스크립트는 소리 재생이나 hook 로직 실행 없이 조용히 종료됩니다.
 
-### Text to Speech (TTS)
-website used to generate sounds: https://elevenlabs.io/
-voice used: Samara X
+### Text to Speech(TTS)
+사운드 생성에 사용한 사이트: https://elevenlabs.io/  
+사용한 음성: Samara X
 
 ## Agent Frontmatter Hooks
 
-Claude Code 2.1.0 introduced support for agent-specific hooks defined in agent frontmatter files. These hooks only run within the agent's lifecycle and support a subset of hook events.
+Claude Code 2.1.0부터 agent frontmatter 파일에 정의하는 agent 전용 hook을 지원합니다. 이 hook은 agent 생명주기 안에서만 실행되며, 전체 hook 이벤트 중 일부만 지원합니다.
 
-### Supported Agent Hooks
+### 지원되는 Agent Hook
 
-Agent frontmatter hooks support **6 hooks** (not all 16). The changelog originally mentioned only 3, but testing confirms 6 hooks actually fire in agent sessions:
-- `PreToolUse`: Runs before the agent uses a tool
-- `PostToolUse`: Runs after the agent completes a tool use
-- `PermissionRequest`: Runs when a tool requires user permission
-- `PostToolUseFailure`: Runs after a tool call fails
-- `Stop`: Runs when the agent finishes
-- `SubagentStop`: Runs when a subagent completes
+agent frontmatter hook은 **6개 hook**을 지원합니다. 16개 전체가 아닙니다. changelog에는 원래 3개만 언급됐지만, 테스트 결과 agent 세션에서 실제로 동작하는 hook은 6개입니다.
+- `PreToolUse`: agent가 도구를 사용하기 전에 실행
+- `PostToolUse`: agent의 도구 사용이 끝난 뒤 실행
+- `PermissionRequest`: 도구가 사용자 권한을 요구할 때 실행
+- `PostToolUseFailure`: 도구 호출이 실패한 뒤 실행
+- `Stop`: agent가 종료될 때 실행
+- `SubagentStop`: subagent가 끝날 때 실행
 
-> **Note:** The [v2.1.0 changelog](https://github.com/anthropics/claude-code/blob/main/CHANGELOG.md#210) only mentions 3 hooks: *"Added hooks support to agent frontmatter, allowing agents to define PreToolUse, PostToolUse, and Stop hooks scoped to the agent's lifecycle"*. However, testing with the `claude-code-voice-hook-agent` confirms that 6 hooks actually fire in agent sessions. The remaining 10 hooks (e.g., Notification, SessionStart, SessionEnd, etc.) do not fire in agent contexts.
+> **참고:** [v2.1.0 changelog](https://github.com/anthropics/claude-code/blob/main/CHANGELOG.md#210)에는 3개 hook만 언급되어 있습니다. *"Added hooks support to agent frontmatter, allowing agents to define PreToolUse, PostToolUse, and Stop hooks scoped to the agent's lifecycle"*. 하지만 `claude-code-voice-hook-agent` 테스트 결과, agent 세션에서는 실제로 6개 hook이 동작합니다. 나머지 10개 hook인 Notification, SessionStart, SessionEnd 등은 agent 컨텍스트에서 동작하지 않습니다.
 >
-> **Update (Feb 2026):** The [official hooks reference](https://code.claude.com/docs/en/hooks) now states *"All hook events are supported"* for skill/agent frontmatter hooks. This may mean support has expanded beyond the 6 hooks originally tested. Re-testing recommended to verify if additional hooks now fire in agent sessions.
+> **Update (Feb 2026):** [공식 hooks reference](https://code.claude.com/docs/en/hooks)는 이제 skill/agent frontmatter hook에 대해 *"All hook events are supported"*라고 명시합니다. 이는 원래 테스트한 6개보다 지원 범위가 넓어졌을 가능성을 뜻합니다. agent 세션에서 추가 hook이 실제로 동작하는지는 재테스트를 권장합니다.
 
-### Agent Sound Folders
+### Agent 사운드 폴더
 
-Agent-specific sounds are stored in separate folders:
+agent 전용 사운드는 아래 별도 폴더에 저장됩니다.
 - `.claude/hooks/sounds/agent_pretooluse/`
 - `.claude/hooks/sounds/agent_posttooluse/`
 - `.claude/hooks/sounds/agent_permissionrequest/`
@@ -187,9 +187,9 @@ Agent-specific sounds are stored in separate folders:
 - `.claude/hooks/sounds/agent_stop/`
 - `.claude/hooks/sounds/agent_subagentstop/`
 
-### Creating an Agent with Hooks
+### Hook이 있는 Agent 만들기
 
-1. Create an agent definition file in `.claude/agents/`:
+1. `.claude/agents/`에 agent 정의 파일을 만듭니다.
 
 ```markdown
 ---
@@ -234,10 +234,10 @@ hooks:
       statusMessage: SubagentStop
 ---
 
-Your agent instructions here...
+여기에 agent 지침을 작성합니다...
 ```
 
-2. Add sound files to the agent sound folders:
+2. agent 사운드 폴더에 사운드 파일을 추가합니다.
    - `agent_pretooluse/agent_pretooluse.wav`
    - `agent_posttooluse/agent_posttooluse.wav`
    - `agent_permissionrequest/agent_permissionrequest.wav`
@@ -245,30 +245,29 @@ Your agent instructions here...
    - `agent_stop/agent_stop.wav`
    - `agent_subagentstop/agent_subagentstop.wav`
 
-### Example: Weather Fetcher Agent
+### 예시: Weather Fetcher Agent
 
-See `.claude/agents/claude-code-voice-hook-agent.md` for a complete example of an agent with hooks configured.
+hook이 설정된 전체 agent 예시는 `.claude/agents/claude-code-voice-hook-agent.md`를 참고합니다.
 
-### Hook Option: `once: true`
+### Hook 옵션: `once: true`
 
-The `once: true` option ensures a hook only runs once per session:
+`once: true` 옵션은 hook이 세션당 한 번만 실행되도록 보장합니다.
 
 ```json
 {
   "type": "command",
   "command": "python3 .claude/hooks/scripts/hooks.py",
-  "timeout": 5000,
   "once": true
 }
 ```
 
-This is useful for hooks like `SessionStart`, `SessionEnd`, and `PreCompact` that should only trigger once.
+이 옵션은 `SessionStart`, `SessionEnd`, `PreCompact`처럼 한 번만 실행되어야 하는 hook에 유용합니다.
 
-> **Note:** The `once` option is for **skills only, not agents**. It works in settings-based hooks and skill frontmatter, but is not supported in agent frontmatter hooks.
+> **참고:** `once` 옵션은 **agent가 아니라 skills용**입니다. settings 기반 hook과 skill frontmatter에서는 동작하지만, agent frontmatter hook에서는 지원되지 않습니다.
 
-### Hook Option: `async: true`
+### Hook 옵션: `async: true`
 
-Hooks can run in the background without blocking Claude Code's execution by adding `"async": true`:
+`"async": true`를 추가하면 Claude Code 실행을 막지 않고 hook을 백그라운드에서 실행할 수 있습니다.
 
 ```json
 {
@@ -279,16 +278,16 @@ Hooks can run in the background without blocking Claude Code's execution by addi
 }
 ```
 
-**When to use async hooks:**
-- Logging and analytics
-- Notifications and sound effects
-- Any side-effect that shouldn't slow down Claude Code
+**async hook 사용 시점:**
+- logging과 analytics
+- notifications와 sound effects
+- Claude Code를 느리게 만들면 안 되는 모든 side-effect
 
-This project uses `async: true` for all hooks since voice notifications are side-effects that don't need to block execution. The `timeout` specifies how long the async hook can run before being terminated.
+이 프로젝트는 음성 알림이 실행을 막을 필요가 없는 side-effect이므로 모든 hook에 `async: true`를 사용합니다. `timeout`은 async hook이 강제 종료되기 전까지 실행될 수 있는 최대 시간을 뜻합니다.
 
-### Hook Option: `asyncRewake` (since v2.1.72, undocumented)
+### Hook 옵션: `asyncRewake` (v2.1.72부터, 문서화되지 않음)
 
-The `asyncRewake` option combines async execution with the ability to wake the model on failure:
+`asyncRewake` 옵션은 async 실행과 실패 시 모델을 다시 깨우는 기능을 결합합니다.
 
 ```json
 {
@@ -298,11 +297,11 @@ The `asyncRewake` option combines async execution with the ability to wake the m
 }
 ```
 
-When `asyncRewake` is `true`, the hook runs in the background (implies `async`) but if it exits with code 2 (blocking error), it wakes the model to handle the error. This is useful for hooks that are normally non-blocking but need to surface critical failures. Discovered in the settings schema `propertyNames` — not yet in official documentation.
+`asyncRewake`가 `true`이면 hook은 백그라운드에서 실행됩니다. 즉 `async`를 내포합니다. 다만 종료 코드 2로 끝나면, 즉 차단성 오류가 발생하면 모델을 다시 깨워 오류를 처리하게 합니다. 평소에는 non-blocking이어야 하지만 치명적 실패는 드러내야 하는 hook에 유용합니다. 이 옵션은 settings schema의 `propertyNames`에서 확인됐고, 아직 공식 문서에는 없습니다.
 
-### Hook Option: `statusMessage`
+### Hook 옵션: `statusMessage`
 
-The `statusMessage` field sets a custom spinner message displayed to the user while the hook is running:
+`statusMessage` 필드는 hook이 실행되는 동안 사용자에게 보여줄 커스텀 spinner 메시지를 지정합니다.
 
 ```json
 {
@@ -314,15 +313,15 @@ The `statusMessage` field sets a custom spinner message displayed to the user wh
 }
 ```
 
-This project sets `statusMessage` to the hook event name on all hooks, so the spinner briefly shows which hook is firing (e.g., "PreToolUse", "SessionStart", "Stop"). This is most visible for synchronous hooks; for async hooks the message flashes briefly before the hook runs in the background.
+이 프로젝트는 모든 hook에서 `statusMessage`를 hook 이벤트 이름으로 설정합니다. 따라서 spinner에 어떤 hook이 실행 중인지 잠시 표시됩니다. 예: `PreToolUse`, `SessionStart`, `Stop`. 이 효과는 동기 hook에서 더 잘 보이고, async hook에서는 백그라운드 실행 전에 잠깐만 표시됩니다.
 
-## Hook Types
+## Hook 유형
 
-Claude Code supports four hook handler types. This project uses `command` hooks for all sound playback.
+Claude Code는 네 가지 hook handler 유형을 지원합니다. 이 프로젝트는 모든 사운드 재생에 `command` hook을 사용합니다.
 
-### `type: "command"` (used by this project)
+### `type: "command"` (이 프로젝트에서 사용)
 
-Runs a shell command. Receives JSON input via stdin, communicates results through exit codes and stdout.
+셸 명령을 실행합니다. stdin으로 JSON 입력을 받고, 종료 코드와 stdout으로 결과를 전달합니다.
 
 ```json
 {
@@ -335,7 +334,7 @@ Runs a shell command. Receives JSON input via stdin, communicates results throug
 
 ### `type: "prompt"`
 
-Sends a prompt to a Claude model for single-turn evaluation. The model returns a yes/no decision as JSON (`{"ok": true/false, "reason": "..."}`). Useful for decisions that require judgment rather than deterministic rules.
+Claude 모델에 single-turn 평가용 프롬프트를 보냅니다. 모델은 yes/no 결정을 JSON 형식인 `{"ok": true/false, "reason": "..."}`로 반환합니다. 결정적 규칙보다 판단이 필요한 경우에 유용합니다.
 
 ```json
 {
@@ -345,11 +344,11 @@ Sends a prompt to a Claude model for single-turn evaluation. The model returns a
 }
 ```
 
-**Supported events:** PreToolUse, PostToolUse, PostToolUseFailure, PermissionRequest, UserPromptSubmit, Stop, SubagentStop, TaskCompleted. **Command-only events (not supported for prompt/agent types):** ConfigChange, Elicitation, ElicitationResult, InstructionsLoaded, Notification, PostCompact, PreCompact, SessionEnd, SessionStart, Setup, SubagentStart, TeammateIdle, WorktreeCreate, WorktreeRemove.
+**지원 이벤트:** PreToolUse, PostToolUse, PostToolUseFailure, PermissionRequest, UserPromptSubmit, Stop, SubagentStop, TaskCompleted. **Command 전용 이벤트(prompt/agent 타입 미지원):** ConfigChange, Elicitation, ElicitationResult, InstructionsLoaded, Notification, PostCompact, PreCompact, SessionEnd, SessionStart, Setup, SubagentStart, TeammateIdle, WorktreeCreate, WorktreeRemove.
 
 ### `type: "agent"`
 
-Spawns a subagent with multi-turn tool access (Read, Grep, Glob) to verify conditions before returning a decision. Same response format as prompt hooks. Useful when verification requires inspecting actual files or test output.
+multi-turn 도구 접근권한(Read, Grep, Glob)이 있는 subagent를 생성해 조건을 검증한 뒤 결정을 반환합니다. 응답 형식은 prompt hook과 동일합니다. 실제 파일이나 테스트 출력을 직접 확인해야 할 때 유용합니다.
 
 ```json
 {
@@ -359,9 +358,9 @@ Spawns a subagent with multi-turn tool access (Read, Grep, Glob) to verify condi
 }
 ```
 
-### `type: "http"` (since v2.1.63)
+### `type: "http"` (v2.1.63부터)
 
-POSTs JSON to a URL and receives a JSON response, instead of running a shell command. Useful for integrating with external services or webhooks. HTTP hooks are routed through the sandbox network proxy when sandboxing is enabled.
+셸 명령을 실행하는 대신 URL에 JSON을 POST하고 JSON 응답을 받습니다. 외부 서비스나 webhook과 연동할 때 유용합니다. sandboxing이 활성화된 경우 HTTP hook은 sandbox network proxy를 통해 라우팅됩니다.
 
 ```json
 {
@@ -375,48 +374,48 @@ POSTs JSON to a URL and receives a JSON response, instead of running a shell com
 }
 ```
 
-**Not supported for:** ConfigChange, Elicitation, ElicitationResult, InstructionsLoaded, Notification, PostCompact, PreCompact, SessionEnd, SessionStart, Setup, SubagentStart, TeammateIdle, WorktreeCreate, WorktreeRemove (command-only events). Headers support environment variable interpolation with `$VAR_NAME`, but only for variables explicitly listed in `allowedEnvVars`.
+**미지원 이벤트:** ConfigChange, Elicitation, ElicitationResult, InstructionsLoaded, Notification, PostCompact, PreCompact, SessionEnd, SessionStart, Setup, SubagentStart, TeammateIdle, WorktreeCreate, WorktreeRemove. 즉 command 전용 이벤트입니다. Header에서는 `$VAR_NAME`으로 환경 변수 치환을 지원하지만, `allowedEnvVars`에 명시한 변수만 사용할 수 있습니다.
 
-## Environment Variables
+## 환경 변수
 
-Claude Code provides these environment variables to hook scripts:
+Claude Code는 hook 스크립트에 아래 환경 변수를 제공합니다.
 
-| Variable | Availability | Description |
+| 변수 | 사용 가능 범위 | 설명 |
 |----------|-------------|-------------|
-| `$CLAUDE_PROJECT_DIR` | All hooks | Project root directory. Wrap in quotes for paths with spaces |
-| `$CLAUDE_ENV_FILE` | SessionStart only | File path for persisting environment variables for subsequent Bash commands. Use append (`>>`) to preserve variables from other hooks |
-| `${CLAUDE_PLUGIN_ROOT}` | Plugin hooks | Plugin's root directory, for scripts bundled with a plugin |
-| `$CLAUDE_CODE_REMOTE` | All hooks | Set to `"true"` in remote web environments, not set in local CLI |
-| `${CLAUDE_SKILL_DIR}` | Skill hooks | Skill's own directory, for scripts bundled with a skill (since v2.1.69) |
-| `CLAUDE_CODE_SESSIONEND_HOOKS_TIMEOUT_MS` | SessionEnd hooks | Override SessionEnd hook timeout in milliseconds. Prior to v2.1.74, SessionEnd hooks were killed after 1.5s regardless of configured `timeout`. Now respects the hook's `timeout` value, or this env var if set (since v2.1.74) |
-| `session_id` (via stdin JSON) | All hooks | Current session ID, received as part of the JSON input on stdin (not an environment variable) |
+| `$CLAUDE_PROJECT_DIR` | 모든 hook | 프로젝트 루트 디렉토리. 경로에 공백이 있으면 따옴표로 감싸야 함 |
+| `$CLAUDE_ENV_FILE` | SessionStart 전용 | 이후 Bash 명령에서 사용할 환경 변수를 저장하는 파일 경로. 다른 hook의 변수를 보존하려면 append(`>>`) 사용 |
+| `${CLAUDE_PLUGIN_ROOT}` | Plugin hook | plugin과 함께 배포된 스크립트용 plugin 루트 디렉토리 |
+| `$CLAUDE_CODE_REMOTE` | 모든 hook | 원격 웹 환경에서는 `"true"`로 설정됨. 로컬 CLI에서는 설정되지 않음 |
+| `${CLAUDE_SKILL_DIR}` | Skill hook | skill과 함께 배포된 스크립트용 skill 자체 디렉토리. v2.1.69부터 |
+| `CLAUDE_CODE_SESSIONEND_HOOKS_TIMEOUT_MS` | SessionEnd hook | SessionEnd hook timeout을 밀리초 단위로 덮어씀. v2.1.74 이전에는 설정한 `timeout`과 관계없이 1.5초 후 강제 종료됐지만, 이제는 hook의 `timeout` 또는 이 환경 변수 값을 따름 |
+| `session_id` (stdin JSON으로 전달) | 모든 hook | 현재 세션 ID. 환경 변수가 아니라 stdin JSON의 일부로 전달됨 |
 
-### Common Input Fields (stdin JSON)
+### 공통 입력 필드(stdin JSON)
 
-Every hook receives a JSON object on stdin containing these common fields, in addition to any hook-specific fields listed in the Options column above:
+모든 hook은 위 표의 옵션 칼럼에 적힌 hook 전용 필드 외에도, 아래 공통 필드를 포함한 JSON 객체를 stdin으로 전달받습니다.
 
-| Field | Type | Description |
+| 필드 | 타입 | 설명 |
 |-------|------|-------------|
-| `hook_event_name` | string | Name of the hook event that fired (e.g., `"PreToolUse"`, `"Stop"`) |
-| `session_id` | string | Current session identifier |
-| `transcript_path` | string | Path to the conversation transcript JSON file |
-| `cwd` | string | Current working directory |
-| `permission_mode` | string | Current permission mode: `default`, `plan`, `acceptEdits`, `dontAsk`, or `bypassPermissions` |
-| `agent_id` | string | Unique subagent identifier. Present when the hook fires inside a subagent context (since v2.1.69) |
-| `agent_type` | string | Agent type name (e.g. `Bash`, `Explore`, `Plan`, or custom). Present when using `--agent <name>` flag or inside a subagent (since v2.1.69) |
+| `hook_event_name` | string | 실행된 hook 이벤트 이름. 예: `"PreToolUse"`, `"Stop"` |
+| `session_id` | string | 현재 세션 식별자 |
+| `transcript_path` | string | 대화 transcript JSON 파일 경로 |
+| `cwd` | string | 현재 작업 디렉토리 |
+| `permission_mode` | string | 현재 권한 모드. `default`, `plan`, `acceptEdits`, `dontAsk`, `bypassPermissions` 중 하나 |
+| `agent_id` | string | subagent 고유 식별자. hook이 subagent 컨텍스트에서 실행될 때 존재. v2.1.69부터 |
+| `agent_type` | string | agent 유형 이름. 예: `Bash`, `Explore`, `Plan`, 또는 custom name. `--agent <name>` 플래그를 쓰거나 subagent 내부일 때 존재. v2.1.69부터 |
 
-> **Note:** Hook-specific fields (e.g., `tool_name` for PreToolUse, `last_assistant_message` for Stop) are listed in the Options column of the [Hook Events Overview](#hook-events-overview---official-22-hooks) table above.
+> **참고:** hook 전용 필드인 `tool_name`(PreToolUse)이나 `last_assistant_message`(Stop) 같은 값은 위의 [Hook 이벤트 개요](#hook-이벤트-개요---공식-22개-hook) 표의 옵션 칼럼에 정리되어 있습니다.
 
-## Hooks Management Commands
+## Hook 관리 명령
 
-Claude Code provides built-in commands for managing hooks:
+Claude Code는 hook 관리를 위한 내장 명령을 제공합니다.
 
-- **`/hooks`** — Interactive hook management UI. View, add, and delete hooks without editing JSON files. Hooks are labeled by source: `[User]`, `[Project]`, `[Local]`, `[Plugin]`. You can also toggle `disableAllHooks` from this menu.
-- **`claude hooks reload`** — Reload hooks configuration without restarting the session. Useful after editing settings files (since v2.0.47).
+- **`/hooks`** — 인터랙티브 hook 관리 UI. JSON 파일을 직접 수정하지 않고 hook을 조회, 추가, 삭제할 수 있습니다. hook은 `[User]`, `[Project]`, `[Local]`, `[Plugin]`처럼 출처별로 표시됩니다. 이 메뉴에서 `disableAllHooks`도 토글할 수 있습니다.
+- **`claude hooks reload`** — 세션을 재시작하지 않고 hook 설정을 다시 불러옵니다. settings 파일을 수정한 뒤 유용합니다. v2.0.47부터 지원됩니다.
 
-## MCP Tool Matchers
+## MCP Tool Matcher
 
-For `PreToolUse`, `PostToolUse`, and `PermissionRequest` hooks, you can match MCP (Model Context Protocol) tools using the pattern `mcp__<server>__<tool>`:
+`PreToolUse`, `PostToolUse`, `PermissionRequest` hook에서는 `mcp__<server>__<tool>` 패턴으로 MCP(Model Context Protocol) 도구를 매칭할 수 있습니다.
 
 ```json
 {
@@ -429,93 +428,93 @@ For `PreToolUse`, `PostToolUse`, and `PermissionRequest` hooks, you can match MC
 }
 ```
 
-Full regex is supported: `mcp__memory__.*` (all tools from memory server), `mcp__.*__write.*` (any write tool from any server).
+전체 정규식을 지원합니다. 예: `mcp__memory__.*`는 memory 서버의 모든 도구, `mcp__.*__write.*`는 모든 서버의 write 계열 도구를 의미합니다.
 
-### Per-Hook Matcher Reference
+### Hook별 Matcher 참고
 
-Matchers filter which events trigger a hook. Not all hooks support matchers — hooks without matcher support always fire.
+matcher는 어떤 이벤트가 hook을 실행시킬지 필터링합니다. 모든 hook이 matcher를 지원하는 것은 아니며, matcher를 지원하지 않는 hook은 항상 실행됩니다.
 
-| Hook | Matcher Field | Possible Values | Example |
+| Hook | Matcher 필드 | 가능한 값 | 예시 |
 |------|--------------|-----------------|---------|
-| `PreToolUse` | `tool_name` | Any tool name: `Bash`, `Read`, `Edit`, `Write`, `Glob`, `Grep`, `Agent`, `WebFetch`, `WebSearch`, `mcp__*` | `"matcher": "Bash"` |
-| `PermissionRequest` | `tool_name` | Same as PreToolUse | `"matcher": "mcp__memory__.*"` |
-| `PostToolUse` | `tool_name` | Same as PreToolUse | `"matcher": "Write"` |
-| `PostToolUseFailure` | `tool_name` | Same as PreToolUse | `"matcher": "Bash"` |
+| `PreToolUse` | `tool_name` | 임의의 도구 이름. `Bash`, `Read`, `Edit`, `Write`, `Glob`, `Grep`, `Agent`, `WebFetch`, `WebSearch`, `mcp__*` 등 | `"matcher": "Bash"` |
+| `PermissionRequest` | `tool_name` | PreToolUse와 동일 | `"matcher": "mcp__memory__.*"` |
+| `PostToolUse` | `tool_name` | PreToolUse와 동일 | `"matcher": "Write"` |
+| `PostToolUseFailure` | `tool_name` | PreToolUse와 동일 | `"matcher": "Bash"` |
 | `Notification` | `notification_type` | `permission_prompt`, `idle_prompt`, `auth_success`, `elicitation_dialog` | `"matcher": "permission_prompt"` |
-| `SubagentStart` | `agent_type` | `Bash`, `Explore`, `Plan`, or custom agent name | `"matcher": "Bash"` |
-| `SubagentStop` | `agent_type` | `Bash`, `Explore`, `Plan`, or custom agent name | `"matcher": "Bash"` |
+| `SubagentStart` | `agent_type` | `Bash`, `Explore`, `Plan`, 또는 custom agent name | `"matcher": "Bash"` |
+| `SubagentStop` | `agent_type` | `Bash`, `Explore`, `Plan`, 또는 custom agent name | `"matcher": "Bash"` |
 | `SessionStart` | `source` | `startup`, `resume`, `clear`, `compact` | `"matcher": "startup"` |
 | `SessionEnd` | `reason` | `clear`, `logout`, `prompt_input_exit`, `bypass_permissions_disabled`, `other` | `"matcher": "logout"` |
 | `PreCompact` | `trigger` | `manual`, `auto` | `"matcher": "auto"` |
 | `PostCompact` | `trigger` | `manual`, `auto` | `"matcher": "manual"` |
-| `Elicitation` | `mcp_server_name` | MCP server name | `"matcher": "my-mcp-server"` |
-| `ElicitationResult` | `mcp_server_name` | MCP server name | `"matcher": "my-mcp-server"` |
+| `Elicitation` | `mcp_server_name` | MCP 서버 이름 | `"matcher": "my-mcp-server"` |
+| `ElicitationResult` | `mcp_server_name` | MCP 서버 이름 | `"matcher": "my-mcp-server"` |
 | `ConfigChange` | `source` | `user_settings`, `project_settings`, `local_settings`, `policy_settings`, `skills` | `"matcher": "project_settings"` |
-| `UserPromptSubmit` | — | No matcher support | Always fires |
-| `Stop` | — | No matcher support | Always fires |
-| `TeammateIdle` | — | No matcher support | Always fires |
-| `TaskCompleted` | — | No matcher support | Always fires |
-| `WorktreeCreate` | — | No matcher support | Always fires |
-| `WorktreeRemove` | — | No matcher support | Always fires |
-| `InstructionsLoaded` | — | No matcher support | Always fires |
-| `Setup` | — | No matcher support | Always fires |
+| `UserPromptSubmit` | — | matcher 미지원 | 항상 실행 |
+| `Stop` | — | matcher 미지원 | 항상 실행 |
+| `TeammateIdle` | — | matcher 미지원 | 항상 실행 |
+| `TaskCompleted` | — | matcher 미지원 | 항상 실행 |
+| `WorktreeCreate` | — | matcher 미지원 | 항상 실행 |
+| `WorktreeRemove` | — | matcher 미지원 | 항상 실행 |
+| `InstructionsLoaded` | — | matcher 미지원 | 항상 실행 |
+| `Setup` | — | matcher 미지원 | 항상 실행 |
 
-## Known Issues & Workarounds
+## 알려진 이슈와 우회 방법
 
-### Agent Stop Hook Bug (SubagentStop vs Stop)
+### Agent Stop Hook 버그(SubagentStop vs Stop)
 
 **Bug Report:** [GitHub Issue #19220](https://github.com/anthropics/claude-code/issues/19220)
 
-**Issue:** When defining a `Stop` hook in an agent's frontmatter, the `hook_event_name` passed to the hook script is `"SubagentStop"` instead of `"Stop"`. This contradicts the official documentation and breaks consistency with other agent hooks (`PreToolUse` and `PostToolUse`), which correctly pass their configured names.
+**문제:** agent frontmatter에 `Stop` hook을 정의해도, hook 스크립트에 전달되는 `hook_event_name`은 `"Stop"`이 아니라 `"SubagentStop"`입니다. 이는 공식 문서와 어긋나며, 설정한 이름이 그대로 전달되는 다른 agent hook인 `PreToolUse`, `PostToolUse`와도 일관되지 않습니다.
 
-| Hook | Defined As | Received As | Status |
+| Hook | 정의 값 | 전달 값 | 상태 |
 |------|------------|-------------|--------|
-| PreToolUse | `PreToolUse:` | `"PreToolUse"` | ✅ Correct |
-| PostToolUse | `PostToolUse:` | `"PostToolUse"` | ✅ Correct |
-| Stop | `Stop:` | `"SubagentStop"` | ❌ Inconsistent |
+| PreToolUse | `PreToolUse:` | `"PreToolUse"` | ✅ 정상 |
+| PostToolUse | `PostToolUse:` | `"PostToolUse"` | ✅ 정상 |
+| Stop | `Stop:` | `"SubagentStop"` | ❌ 비일관적 |
 
-**Status:** The [official hooks reference](https://code.claude.com/docs/en/hooks#hooks-in-skills-and-agents) now documents this as expected behavior: *"For subagents, Stop hooks are automatically converted to SubagentStop since that is the event that fires when a subagent completes."* This project handles it via the `AGENT_HOOK_SOUND_MAP` in `hooks.py`, which has a separate `SubagentStop` entry that maps to the `agent_subagentstop` sound folder.
+**상태:** [공식 hooks reference](https://code.claude.com/docs/en/hooks#hooks-in-skills-and-agents)는 현재 이를 정상 동작으로 문서화하고 있습니다. *"For subagents, Stop hooks are automatically converted to SubagentStop since that is the event that fires when a subagent completes."* 이 프로젝트는 `hooks.py`의 `AGENT_HOOK_SOUND_MAP`에서 별도의 `SubagentStop` 항목을 두고 `agent_subagentstop` 사운드 폴더에 매핑해 처리합니다.
 
-### PreToolUse Decision Control Deprecation
+### PreToolUse Decision Control deprecated
 
-The `PreToolUse` hook previously used top-level `decision` and `reason` fields for blocking tool calls. These are now **deprecated**. Use `hookSpecificOutput.permissionDecision` and `hookSpecificOutput.permissionDecisionReason` instead:
+`PreToolUse` hook은 과거에 top-level `decision`, `reason` 필드로 도구 호출을 차단했습니다. 이 방식은 이제 **deprecated**입니다. 대신 `hookSpecificOutput.permissionDecision`, `hookSpecificOutput.permissionDecisionReason`을 사용합니다.
 
 | Deprecated | Current |
 |-----------|---------|
 | `"decision": "approve"` | `"hookSpecificOutput": { "permissionDecision": "allow" }` |
 | `"decision": "block"` | `"hookSpecificOutput": { "permissionDecision": "deny" }` |
 
-This does not affect this project since `hooks.py` uses async sound playback and does not use decision control.
+이 프로젝트는 `hooks.py`에서 async 사운드 재생만 사용하고 decision control은 사용하지 않으므로 직접적인 영향은 없습니다.
 
-## Decision Control Patterns
+## Decision Control 패턴
 
-Different hooks use different output schemas for blocking or controlling execution. This project does not use decision control (all hooks are async sound playback), but for reference:
+hook마다 실행 차단 또는 제어를 위한 출력 스키마가 다릅니다. 이 프로젝트는 decision control을 사용하지 않고 모든 hook이 async 사운드 재생만 수행하지만, 참고용으로 정리합니다.
 
-| Hook(s) | Control Method | Values |
+| Hook | 제어 방식 | 값 |
 |---------|---------------|--------|
 | PreToolUse | `hookSpecificOutput.permissionDecision` | `allow`, `deny`, `ask` |
 | PreToolUse | `hookSpecificOutput.autoAllow` | `true` — auto-approve future uses of this tool (since v2.0.76) |
 | PermissionRequest | `hookSpecificOutput.decision.behavior` | `allow`, `deny` |
-| PostToolUse, PostToolUseFailure, Stop, SubagentStop, ConfigChange | Top-level `decision` | `block` |
+| PostToolUse, PostToolUseFailure, Stop, SubagentStop, ConfigChange | top-level `decision` | `block` |
 | TeammateIdle, TaskCompleted | `continue` + exit code 2 | `{"continue": false, "stopReason": "..."}` — JSON decision control added in v2.1.70 |
 | UserPromptSubmit | Can modify `prompt` field | Returns modified prompt via stdout |
 | WorktreeCreate | Non-zero exit + stdout path | Non-zero exit fails creation; stdout provides worktree path |
 | Elicitation | `hookSpecificOutput.action` + `hookSpecificOutput.content` | `accept`, `decline`, `cancel` — control MCP elicitation response |
 | ElicitationResult | `hookSpecificOutput.action` + `hookSpecificOutput.content` | `accept`, `decline`, `cancel` — override user response before sending to server |
 
-### Universal JSON Output Fields
+### 공통 JSON 출력 필드
 
-All hooks can return these fields via stdout JSON:
+모든 hook은 stdout JSON으로 아래 필드를 반환할 수 있습니다.
 
-| Field | Type | Description |
+| 필드 | 타입 | 설명 |
 |-------|------|-------------|
-| `continue` | bool | If `false`, stops Claude entirely |
-| `stopReason` | string | Message shown when `continue` is false |
-| `suppressOutput` | bool | Hides stdout from verbose mode |
-| `systemMessage` | string | Warning message shown to user |
-| `additionalContext` | string | Context added to Claude's conversation |
+| `continue` | bool | `false`면 Claude를 완전히 중단 |
+| `stopReason` | string | `continue`가 `false`일 때 보여줄 메시지 |
+| `suppressOutput` | bool | verbose mode에서 stdout 숨김 |
+| `systemMessage` | string | 사용자에게 보여줄 경고 메시지 |
+| `additionalContext` | string | Claude 대화에 추가할 컨텍스트 |
 
-## Hook Deduplication & External Changes
+## Hook 중복 제거와 외부 변경
 
-- **Hook deduplication:** Identical hook handlers defined in multiple settings locations run only once in parallel, preventing duplicate execution.
-- **External change detection:** Claude Code warns when hooks are modified externally (e.g., by another process editing settings files) during an active session.
+- **Hook deduplication:** 여러 settings 위치에 동일한 hook handler가 정의돼 있으면 병렬로 한 번만 실행되어 중복 실행을 막습니다.
+- **External change detection:** 활성 세션 중 다른 프로세스가 settings 파일을 수정하는 등 외부에서 hook이 변경되면 Claude Code가 경고합니다.

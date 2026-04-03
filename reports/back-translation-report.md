@@ -23,6 +23,7 @@
 | `docs/SKILLS.md` | PASS | 0 | 0 | 12 | SKILL 형식, 필드 정의, 탐색 경로, 패턴 설명 의미 유지 |
 | `orchestration-workflow/orchestration-workflow.md` | PASS | 0 | 0 | 11 | Agent → Skill 패턴, 제약 설명, 실행 흐름 의미 유지 |
 | `.agents/skills/weather-svg-creator/SKILL.md` | PASS | 0 | 0 | 9 | 입력/출력 경로, 덮어쓰기 지침, 데이터 보존 제약 의미 유지 |
+| `.claude/hooks/HOOKS-README.md` | PASS | 0 | 0 | 22 | hook 유형, 옵션 제약, matcher 표, 버그/우회 설명 의미 유지 |
 
 ## 배치 A 재검토
 
@@ -83,3 +84,10 @@
 - 결과: PASS
 - 판단 근거: `orchestration-workflow/` 경로, 덮어쓰기 지침, 입력 데이터 재사용 금지, 타임스탬프 포함 요구가 모두 유지됨
 - 특이사항: frontmatter key, `name`, `argument-hint`, 코드 블록, 파일 경로는 원문 식별자 보존을 우선함
+
+### `.claude/hooks/HOOKS-README.md`
+
+- 비교 범위: 공식 hook 개요 표, 비공식 항목, 사전 요구 사항, 설정 방법, agent frontmatter hooks, 옵션 설명, hook 유형, 환경 변수, matcher 표, 알려진 이슈, decision control 패턴
+- 결과: PASS
+- 판단 근거: hook 이름, matcher 값, 환경 변수, 경로, JSON 예시, deprecated 제약, 지원/미지원 범위가 모두 유지됨
+- 특이사항: hook 이름, 설정 키, 경로, 환경 변수, JSON 필드, 제품명은 원문 식별자 보존을 우선함
