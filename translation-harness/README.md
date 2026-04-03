@@ -14,7 +14,7 @@
 ## 기준 원문
 
 - upstream 영어 문서가 기준 원문입니다.
-- 역번역 비교용 원문 스냅샷은 `.originals/`에 보관합니다.
+- 역번역 비교용 원문 스냅샷은 작업 중에만 `.originals/`에 임시 보관합니다.
 - 진행 상황과 검토 결과는 `reports/`에 기록합니다.
 
 ## 디렉토리 역할
@@ -25,7 +25,7 @@
 - `.agents/skills/validation-rules/SKILL.md`: 구조 검증 체크리스트
 - `.agents/skills/sync-upstream/SKILL.md`: `main`과 `ko` 동기화 절차
 - `.agents/skills/commit-rules/SKILL.md`: 한글 커밋 메시지와 커밋 전 검증 규칙
-- `.originals/`: 원문 스냅샷
+- `.originals/`: 역번역 검증용 임시 원문 스냅샷 디렉토리. 커밋하지 않습니다
 - `reports/translation-progress.md`: 배치 진행 현황
 - `reports/back-translation-report.md`: 역번역 의미 검증 결과
 - `reports/retranslation-needed.md`: upstream 동기화 후 재번역 필요 목록
@@ -48,11 +48,12 @@
 1. `main`을 `upstream` 기준으로 동기화합니다.
 2. `main`을 `ko`에 병합합니다.
 3. `translation-targets` 규칙으로 변경된 번역 대상 파일을 식별해 `reports/retranslation-needed.md`에 기록합니다.
-4. 원문 스냅샷을 `.originals/`에 저장합니다.
+4. 원문 스냅샷을 `.originals/`에 임시 저장합니다.
 5. `ko`에서 선택한 배치를 번역합니다.
 6. `validation-rules` 기준으로 구조 검증을 수행합니다.
 7. 역번역 검증 결과를 `reports/back-translation-report.md`에 기록합니다.
 8. `reports/translation-progress.md`를 갱신합니다.
+9. 역번역 검증이 끝나면 `.originals/` 스냅샷을 제거합니다.
 
 ## 현재 번역 범위
 
@@ -63,6 +64,7 @@
 번역 하네스는 upstream 추적과 충돌하지 않도록 다음 원칙을 따릅니다.
 
 - 기존 upstream 파일 수정은 최소화합니다.
-- 새 운영 규칙은 가능하면 `translation-harness/`, `.agents/skills/`, `reports/`, `.originals/` 아래에 둡니다.
+- 새 운영 규칙은 가능하면 `translation-harness/`, `.agents/skills/`, `reports/` 아래에 둡니다.
 - `AGENTS.md`는 진입점 역할만 하며 상세 운영 규칙을 직접 담지 않습니다.
 - upstream 변경과 번역 변경이 충돌하면 upstream 영어 내용을 먼저 반영하고, 이후 `ko`에서 다시 번역합니다.
+- `.originals/`는 임시 작업 디렉토리이므로 커밋하지 않고, 검증이 끝나면 비웁니다.

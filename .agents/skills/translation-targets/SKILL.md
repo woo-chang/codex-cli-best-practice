@@ -46,8 +46,9 @@ user-invocable: false
 - `.codex/agents/*.toml` 같은 설정 및 실행 자산
 - 이미지, SVG, 배지, 오디오, 바이너리 파일
 - `examples/` 아래의 TOML, YAML 예시 구성 파일
-- `translation-harness/`, `reports/`, `.originals/` 아래의 운영 파일
-  이 파일들은 번역 결과물이 아니라 하네스 운영 자산입니다.
+- `translation-harness/`, `reports/` 아래의 운영 파일
+- `.originals/` 아래의 임시 스냅샷 파일
+  이 파일들은 번역 결과물이 아니라 하네스 운영 또는 임시 작업 자산입니다.
 
 ## upstream 변경 후 재번역 식별
 
@@ -55,7 +56,8 @@ user-invocable: false
 2. 변경 파일 목록을 구합니다.
 3. 변경 파일 중 현재 번역 대상 배치에 포함된 파일만 추립니다.
 4. 해당 파일을 `reports/retranslation-needed.md`에 기록합니다.
-5. 재번역이 필요한 파일의 영어 원문을 `.originals/`에 저장합니다.
+5. 재번역이 필요한 파일의 영어 원문을 `.originals/`에 임시 저장합니다.
+6. 역번역 검증이 끝나면 `.originals/`를 정리합니다.
 
 ## 기록 규칙
 

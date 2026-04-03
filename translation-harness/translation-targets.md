@@ -48,9 +48,10 @@
 - `.codex/agents/` 아래 TOML 에이전트 정의
 - `examples/` 아래 예시 설정 파일
 - 이미지, SVG, GIF, 오디오 등 비텍스트 자산
-- `translation-harness/`, `reports/`, `.originals/` 아래 운영 자산
+- `translation-harness/`, `reports/` 아래 운영 자산
+- `.originals/` 아래 임시 스냅샷 파일
 
-운영 자산은 한국어로 관리할 수 있지만, 그것은 번역 결과물이 아니라 하네스 유지보수 작업으로 취급합니다.
+운영 자산은 한국어로 관리할 수 있지만, 그것은 번역 결과물이 아니라 하네스 유지보수 작업으로 취급합니다. `.originals/`는 유지보수 자산도 아니며 검증을 위한 임시 작업 디렉토리입니다.
 
 ## upstream 변경 후 식별 절차
 
@@ -58,8 +59,9 @@
 2. `origin/main..upstream/main` 또는 `main..upstream/main` 범위의 변경 파일 목록 확인
 3. 배치 목록과 교집합인 파일만 추출
 4. 해당 파일을 `reports/retranslation-needed.md`에 기록
-5. `.originals/`에 기준 원문 스냅샷 저장
+5. `.originals/`에 기준 원문 스냅샷을 임시 저장
 6. 해당 배치만 재번역
+7. 역번역 검증 후 `.originals/` 정리
 
 ## 운영 메모
 

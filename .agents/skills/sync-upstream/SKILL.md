@@ -29,8 +29,9 @@ fork를 upstream 기준으로 갱신할 때 이 절차를 사용합니다.
 동기화 후에는 다음을 수행합니다.
 
 - `reports/retranslation-needed.md`를 갱신합니다
-- 재번역할 파일의 `.originals/` 스냅샷을 갱신합니다
+- 재번역할 파일의 `.originals/` 임시 스냅샷을 갱신합니다
 - 이후 번역 작업은 `ko`에서만 계속합니다
+- 역번역 검증이 끝나면 `.originals/`를 비웁니다
 
 ## 충돌 처리 원칙
 

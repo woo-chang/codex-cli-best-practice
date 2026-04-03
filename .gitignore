@@ -6,6 +6,7 @@ AGENTS.override.md
 
 # Generated workflow output
 orchestration-workflow/output.md
+.originals/
 
 # Dependencies
 node_modules/
