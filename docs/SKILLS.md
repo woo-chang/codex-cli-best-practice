@@ -1,10 +1,10 @@
-# Skills System Reference
+# Skills 시스템 레퍼런스
 
-Skills are reusable instruction packages that extend Codex CLI's capabilities. They follow the open **SKILL.md standard**, making them portable and shareable across projects.
+Skills는 Codex CLI의 기능을 확장하는 재사용 가능한 instruction package입니다. 이들은 공개 **SKILL.md 표준**을 따르므로, 프로젝트 간에 이식 가능하고 공유하기 쉽습니다.
 
-## SKILL.md File Format
+## SKILL.md 파일 형식
 
-Skills live in `.agents/skills/<name>/SKILL.md`. Each skill is a Markdown file with YAML frontmatter:
+Skills는 `.agents/skills/<name>/SKILL.md`에 위치합니다. 각 skill은 YAML 프론트매터를 포함한 Markdown 파일입니다.
 
 ```markdown
 ---
@@ -20,59 +20,59 @@ model: o4-mini
 Detailed instructions for what the skill should do when invoked...
 ```
 
-## Frontmatter Fields
+## 프론트매터 필드
 
-| Field | Type | Default | Description |
+| 필드 | 타입 | 기본값 | 설명 |
 |---|---|---|---|
-| `name` | string | Directory name | Display name and `/slash-command` trigger |
-| `description` | string | — | Purpose description; used for auto-discovery ranking |
-| `argument-hint` | string | — | Autocomplete hint shown after `/name` (e.g., `[issue-number]`) |
-| `disable-model-invocation` | bool | `false` | Prevents automatic invocation; must be explicitly called |
-| `user-invocable` | bool | `true` | If `false`, hidden from `/` menu (background knowledge only) |
-| `allowed-tools` | string | — | Comma-separated tools allowed without permission prompts |
-| `model` | string | Inherited | Model to use: `o4-mini`, `o3`, `gpt-4.1` |
-| `context` | string | — | Set to `fork` to run in isolated subagent context |
-| `agent` | string | `general-purpose` | Subagent type when `context: fork` |
-| `hooks` | object | — | Lifecycle hooks scoped to this skill |
+| `name` | string | 디렉토리 이름 | 표시 이름과 `/slash-command` 트리거 |
+| `description` | string | — | 목적 설명. auto-discovery 순위에 사용 |
+| `argument-hint` | string | — | `/name` 뒤에 표시되는 자동완성 힌트. 예: `[issue-number]` |
+| `disable-model-invocation` | bool | `false` | 자동 호출을 막습니다. 명시적으로만 호출 가능 |
+| `user-invocable` | bool | `true` | `false`면 `/` 메뉴에 숨겨짐. 배경 지식용 |
+| `allowed-tools` | string | — | 추가 승인 없이 허용되는 도구 목록. 쉼표로 구분 |
+| `model` | string | Inherited | 사용할 모델. 예: `o4-mini`, `o3`, `gpt-4.1` |
+| `context` | string | — | 고립된 subagent 컨텍스트에서 실행하려면 `fork`로 설정 |
+| `agent` | string | `general-purpose` | `context: fork`일 때 사용할 subagent 유형 |
+| `hooks` | object | — | 이 skill에 범위 지정된 lifecycle hooks |
 
-## String Substitutions
+## 문자열 치환
 
-Skills support dynamic variable injection:
+Skills는 동적 변수 주입을 지원합니다.
 
-| Variable | Expands To |
+| 변수 | 확장 결과 |
 |---|---|
-| `$ARGUMENTS` | Full argument string passed after the skill name |
-| `$0` | First positional argument |
-| `$1`, `$2`, ... | Subsequent positional arguments |
+| `$ARGUMENTS` | skill 이름 뒤에 전달된 전체 인자 문자열 |
+| `$0` | 첫 번째 위치 인자 |
+| `$1`, `$2`, ... | 그 이후 위치 인자 |
 
-**Example**: If user types `/deploy staging v2.1`, then `$ARGUMENTS` = `staging v2.1`, `$0` = `staging`, `$1` = `v2.1`.
+**예시**: 사용자가 `/deploy staging v2.1`을 입력하면, `$ARGUMENTS`는 `staging v2.1`, `$0`는 `staging`, `$1`은 `v2.1`입니다.
 
 ## Built-in Skills
 
-Codex CLI ships with several built-in skills prefixed with `$`:
+Codex CLI는 `$` 접두사가 붙은 built-in skills를 몇 가지 제공합니다.
 
 ### $plan
-Structured planning skill. Creates a step-by-step plan before executing complex tasks. Automatically invoked when tasks appear multi-step.
+구조화된 planning skill입니다. 복잡한 작업을 실행하기 전에 단계별 계획을 만듭니다. 작업이 다단계로 보이면 자동으로 호출됩니다.
 
 ### $skill-creator
-Meta-skill that generates new SKILL.md files. Invoke with `/skill-creator` and describe what the skill should do.
+새 SKILL.md 파일을 생성하는 meta-skill입니다. `/skill-creator`로 호출하고, skill이 무엇을 해야 하는지 설명하면 됩니다.
 
 ### $web-search
-Web search capability. Fetches and processes web content to answer questions requiring current information.
+웹 검색 기능입니다. 현재 정보가 필요한 질문에 답하기 위해 웹 콘텐츠를 가져오고 처리합니다.
 
-## Discovery Paths
+## 탐색 경로
 
-Codex CLI discovers skills from multiple locations, in priority order:
+Codex CLI는 여러 위치에서 skills를 찾으며, 우선순위는 다음과 같습니다.
 
-1. **Project skills**: `./.agents/skills/` in the current project (scanned up to repo root)
-2. **User skills**: `~/.agents/skills/` for personal cross-project skills
-3. **Built-in skills**: Shipped with Codex CLI (`$plan`, `$skill-creator`, etc.)
+1. **Project skills**: 현재 프로젝트의 `./.agents/skills/` 아래. repo root까지 스캔
+2. **User skills**: 개인용 cross-project skills를 위한 `~/.agents/skills/`
+3. **Built-in skills**: Codex CLI와 함께 제공되는 skills (`$plan`, `$skill-creator` 등)
 
-When multiple skills share a name, the most local version wins (project > user > built-in).
+같은 이름의 skill이 여러 개 있으면 가장 로컬한 버전이 우선합니다. 즉 `project > user > built-in` 순입니다.
 
-## Skill Patterns
+## Skill 패턴
 
-### User-Invocable Skill (Slash Command)
+### 사용자 호출형 Skill (Slash Command)
 ```yaml
 ---
 name: deploy
@@ -81,9 +81,9 @@ argument-hint: "[environment] [version]"
 allowed-tools: Bash, Read
 ---
 ```
-User triggers with `/deploy production v2.0`.
+사용자는 `/deploy production v2.0`처럼 호출합니다.
 
-### Agent-Preloaded Skill (Background Knowledge)
+### 에이전트 사전 로드 Skill (배경 지식)
 ```yaml
 ---
 name: code-standards
@@ -91,7 +91,7 @@ description: Team coding standards and conventions
 user-invocable: false
 ---
 ```
-Loaded into agent context via `[agents.<name>]` role configuration in `.codex/config.toml` and a companion TOML file:
+`.codex/config.toml`의 `[agents.<name>]` 역할 설정과 companion TOML 파일을 통해 agent 컨텍스트에 로드됩니다.
 
 ```toml
 # .codex/config.toml
@@ -106,9 +106,9 @@ model = "o4-mini"
 skills = ["code-standards"]
 ```
 
-Never shown in `/` menu.
+`/` 메뉴에는 표시되지 않습니다.
 
-### Forked Skill (Isolated Execution)
+### Forked Skill (고립 실행)
 ```yaml
 ---
 name: security-audit
@@ -118,9 +118,9 @@ agent: security-reviewer
 allowed-tools: Bash, Read, Grep, Glob
 ---
 ```
-Runs in a separate subagent context to avoid polluting the main conversation.
+메인 대화를 오염시키지 않기 위해 별도의 subagent 컨텍스트에서 실행됩니다.
 
-## Example: Complete Skill
+## 예시: 완전한 Skill
 
 ```markdown
 ---
@@ -142,7 +142,7 @@ Review pull request #$0 and provide structured feedback.
 4. Output a structured review with severity ratings
 
 ## Output Format
-Use this template:
+다음 템플릿을 사용합니다.
 - **Critical**: Issues that must be fixed
 - **Warning**: Issues that should be addressed
 - **Suggestion**: Optional improvements

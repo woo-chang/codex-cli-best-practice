@@ -20,6 +20,7 @@
 | `best-practice/codex-mcp.md` | PASS | 0 | 0 | 6 | MCP 범위 제한, 보안 지침, 안티패턴 의미 유지 |
 | `best-practice/codex-skills.md` | PASS | 0 | 0 | 10 | skill 패턴, frontmatter 지침, 안티패턴 의미 유지 |
 | `best-practice/codex-subagents.md` | PASS | 0 | 0 | 18 | subagent 사용 조건, 승인 상속, CSV 배치 규칙 의미 유지 |
+| `docs/SKILLS.md` | PASS | 0 | 0 | 12 | SKILL 형식, 필드 정의, 탐색 경로, 패턴 설명 의미 유지 |
 
 ## 배치 A 재검토
 
@@ -53,3 +54,12 @@
 - `best-practice/codex-mcp.md`: agent-scoped MCP, `codex mcp-server`, 비밀값 처리 지침 유지
 - `best-practice/codex-skills.md`: user-invocable/agent-preloaded 구분, `allowed-tools`, 모델 선택 기준 유지
 - `best-practice/codex-subagents.md`: 사용 시점, 상속 규칙, custom agent 필드, CSV 배치 처리 규칙 유지
+
+## 배치 C 재검토
+
+### `docs/SKILLS.md`
+
+- 비교 범위: SKILL.md 형식, 프론트매터 필드 표, 문자열 치환, built-in skills, 탐색 경로, skill 패턴, 예시 skill
+- 결과: PASS
+- 판단 근거: 필드 정의, 우선순위 규칙, `project > user > built-in` 탐색 순서, `user-invocable`, `context: fork` 같은 제약과 식별자가 유지됨
+- 특이사항: frontmatter key, 모델명, skill 이름, 명령 예시는 원문 식별자 보존을 우선함
