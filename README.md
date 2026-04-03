@@ -19,13 +19,14 @@ practice makes codex perfect
 | <img src="!/tags/s.svg" height="14"> [**Skills**](https://developers.openai.com/codex/skills) | [`.agents/skills/<name>/SKILL.md`](.agents/skills/) | [![Best Practice](!/tags/best-practice.svg)](best-practice/codex-skills.md) [![Implemented](!/tags/implemented.svg)](.agents/skills/) [Reference](docs/SKILLS.md) Reusable instruction packages with YAML frontmatter — invoke with `/skill-name` or preload into agents · Built-in: `$plan`, `$skill-creator`, `$web-search` · Distributed via [Plugins](https://developers.openai.com/codex/plugins) |
 | [**Plugins**](https://developers.openai.com/codex/plugins) | `.codex-plugin/plugin.json` | Distributable bundles combining skills + app integrations + MCP servers — local/personal [marketplace](https://developers.openai.com/codex/plugins/build) system · Built-in: `$plugin-creator` · Browse via `/plugins` or Codex App |
 | [**Workflows**](https://developers.openai.com/codex/workflows/) | [`.codex/agents/weather-agent.toml`](.codex/agents/weather-agent.toml) | [![Orchestration Workflow](!/tags/orchestration-workflow.svg)](orchestration-workflow/orchestration-workflow.md) End-to-end usage patterns — explain codebase, fix bugs, write tests, prototype from screenshot, iterate UI, delegate to cloud, code review, update docs |
-| [**MCP Servers**](https://developers.openai.com/codex/mcp) | `config.toml` → `[mcp_servers.*]` | [![Best Practice](!/tags/best-practice.svg)](best-practice/codex-mcp.md) [![Implemented](!/tags/implemented.svg)](.codex/config.toml) Model Context Protocol for external tools — STDIO + Streamable HTTP servers · OAuth support (`codex mcp login`) |
-| [**Config**](https://developers.openai.com/codex/config-basic) | [`.codex/config.toml`](.codex/config.toml) | [![Best Practice](!/tags/best-practice.svg)](best-practice/codex-config.md) [![Implemented](!/tags/implemented.svg)](.codex/config.toml) TOML-based layered config system · [Profiles](https://developers.openai.com/codex/config-basic) · [Sandbox](https://developers.openai.com/codex/cli/features) · [Approval Policy](https://developers.openai.com/codex/cli/features) · [Advanced](https://developers.openai.com/codex/config-advanced) (`[features]`, `[otel]`, `[shell_environment_policy]`, `[tui]`, model providers, granular approvals) |
-| [**Rules**](https://developers.openai.com/codex/rules) | `.codex/rules/` | Starlark-based command execution policies — `allow`, `prompt`, `forbidden` decisions with pattern matching · Test via `codex execpolicy check` · [AGENTS.override.md](https://developers.openai.com/codex/guides/agents-md) for personal instruction overrides |
+| [**MCP Servers**](https://developers.openai.com/codex/mcp) | `config.toml` → `[mcp_servers.*]` | [![Best Practice](!/tags/best-practice.svg)](best-practice/codex-mcp.md) [![Implemented](!/tags/implemented.svg)](.codex/config.toml) Model Context Protocol for external tools — STDIO + Streamable HTTP servers · OAuth support (`codex mcp login`) · Also acts as MCP **server** via `codex mcp-server` (exposes `codex()` + `codex-reply()` tools) · CLI management: `codex mcp add\|get\|list\|login\|logout\|remove` |
+| [**Config**](https://developers.openai.com/codex/config-basic) | [`.codex/config.toml`](.codex/config.toml) | [![Best Practice](!/tags/best-practice.svg)](best-practice/codex-config.md) [![Implemented](!/tags/implemented.svg)](.codex/config.toml) TOML-based layered config system · [Profiles](https://developers.openai.com/codex/config-basic) · [Sandbox](https://developers.openai.com/codex/cli/features) · [Approval Policy](https://developers.openai.com/codex/cli/features) · [Advanced](https://developers.openai.com/codex/config-advanced) (`[features]`, `[otel]`, `[shell_environment_policy]`, `[tui]`, model providers, granular approvals) · [Trust](https://developers.openai.com/codex/config-basic) system for project configs · `developer_instructions` · `model_instructions_file` for custom system prompts |
+| [**Rules**](https://developers.openai.com/codex/rules) | `.codex/rules/` | Starlark-based command execution policies — `allow`, `prompt`, `forbidden` decisions with pattern matching · Test via `codex execpolicy check` · [Smart approvals](https://developers.openai.com/codex/rules) (`smart_approvals = true`) route escalations through a guardian model · [AGENTS.override.md](https://developers.openai.com/codex/guides/agents-md) for personal instruction overrides |
 | [**AGENTS.md**](https://developers.openai.com/codex/guides/agents-md) | [`AGENTS.md`](AGENTS.md) | [![Best Practice](!/tags/best-practice.svg)](best-practice/codex-agents-md.md) Project-level context for Codex CLI — hierarchical discovery from cwd to repo root, capped at 32 KiB (`project_doc_max_bytes`) · `AGENTS.override.md` for personal overrides |
 | [**Hooks**](https://developers.openai.com/codex/hooks) ![beta](!/tags/beta.svg) | [`.codex/hooks.json`](.codex/) | [![Best Practice](!/tags/best-practice.svg)](best-practice/codex-hooks.md) [![Implemented](!/tags/implemented.svg)](https://github.com/shanraisshan/codex-cli-hooks) User-defined shell scripts that inject into the agentic loop — logging, security scanning, validation, and custom automation · Requires `codex_hooks = true` feature flag |
 | [**Speed**](https://developers.openai.com/codex/speed) | `config.toml` → `service_tier` | Fast Mode (1.5x speed, 2x credits) on gpt-5.4 — toggle with `/fast on\|off\|status` · GPT-5.3-Codex-Spark for near-instant iteration (Pro subscribers) |
-| [**Multi-Agent**](https://developers.openai.com/codex/multi-agent/) | `config.toml` → `[agents]` | Spawn specialized sub-agents in parallel — fan-out work, collect results, synthesize · `max_threads` (default 6), `max_depth` (default 1) · GA (`multi_agent = true` by default) |
+| [**Multi-Agent**](https://developers.openai.com/codex/multi-agent/) | `config.toml` → `[agents]` | Spawn specialized sub-agents in parallel — fan-out work, collect results, synthesize · `max_threads` (default 6), `max_depth` (default 1), `job_max_runtime_seconds` (default 1800) · Path-based agent addresses (`/root/agent_a`) · GA (`multi_agent = true` by default) |
+| [**Code Review**](https://developers.openai.com/codex/cli/features) | `/review` | Review branches, uncommitted changes, or specific commits — configurable `review_model` in config.toml · Custom review instructions |
 | **AI Terms** | | [![Best Practice](!/tags/best-practice.svg)](https://github.com/shanraisshan/claude-code-codex-cursor-gemini/blob/main/reports/ai-terms.md) Agentic Engineering · Context Engineering · Vibe Coding |
 | [**Best Practices**](https://developers.openai.com/codex/learn/best-practices) | | Official best practices · [Prompt Engineering](https://platform.openai.com/docs/guides/prompt-engineering) · [Codex Guides](https://developers.openai.com/codex/overview) |
 
@@ -74,7 +75,7 @@ All major workflows converge on the same architectural pattern: **Research → P
   <img src="!/codex-jumping.svg" alt="section divider" width="60" height="50">
 </p>
 
-## 💡 TIPS AND TRICKS (50)
+## 💡 TIPS AND TRICKS (47)
 
 [Prompting](#tips-prompting) · [Planning](#tips-planning) · [AGENTS.md](#tips-agentsmd) · [Agents](#tips-agents) · [Skills](#tips-skills) · [Hooks](#tips-hooks) · [Workflows](#tips-workflows) · [Advanced](#tips-workflows-advanced) · [Git / PR](#tips-git-pr) · [Debugging](#tips-debugging) · [Utilities](#tips-utilities) · [Daily](#tips-daily)
 
@@ -134,17 +135,14 @@ All major workflows converge on the same architectural pattern: **Research → P
 | use [hooks](https://developers.openai.com/codex/hooks) for logging, security scanning, and validation — requires codex_hooks = true feature flag |
 | use hooks for auto-formatting code — Codex generates well-formatted code, the hook handles the last 10% to avoid CI failures |
 
-<a id="tips-workflows"></a>■ **Workflows (7)**
+<a id="tips-workflows"></a>■ **Workflows (4)**
 
 | Tip |
 |-----|
 | vanilla Codex is better than any workflows with smaller tasks |
 | use [profiles](https://developers.openai.com/codex/config-basic) to switch between project-defined safety levels — in this repo, conservative and trusted are examples |
 | start with [on-request](https://developers.openai.com/codex/cli/features) approval policy — only escalate to never when confident |
-| use [--fork](https://developers.openai.com/codex/cli/features) to explore alternatives without losing your session, [--resume](https://developers.openai.com/codex/cli/features) to pick up where you left off |
-| use [/model](https://developers.openai.com/codex/cli/slash-commands) to select model, [/fast](https://developers.openai.com/codex/speed) to toggle speed mode |
-| /rename important sessions and /resume them later — label each instance when running multiple Codex instances simultaneously |
-| use Esc Esc to undo when Codex goes off-track instead of trying to fix it in the same context |
+| use [/fork](https://developers.openai.com/codex/cli/slash-commands) in-session (or `codex fork`) to explore alternatives without losing your current thread, and [/resume](https://developers.openai.com/codex/cli/slash-commands) (or `codex resume`) to pick up where you left off |
 
 <a id="tips-workflows-advanced"></a>■ **Workflows Advanced (5)**
 
