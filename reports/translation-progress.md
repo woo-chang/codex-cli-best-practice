@@ -1,15 +1,15 @@
-# Translation Progress
+# 번역 진행 상황
 
-| Batch | Scope | Files | Status | Updated |
+| 배치 | 범위 | 파일 수 | 상태 | 업데이트 일시 |
 |---|---|---:|---|---|
-| A | Repo entry points (`AGENTS.md`, `README.md`) | 2 | pending | - |
-| B | Best practice docs (`best-practice/*.md`) | 6 | pending | - |
-| C | Reference docs (`docs/*.md`) | 1 | pending | - |
-| D | Workflow docs (`orchestration-workflow/*.md`) | 1 | pending | - |
-| E | Translation harness docs and reports | 6 | complete | 2026-04-03 |
+| A | 진입점 문서 (`AGENTS.md`, `README.md`) | 2 | 완료 | 2026-04-03 |
+| B | 모범 사례 문서 (`best-practice/*.md`) | 6 | 대기 | - |
+| C | 참고 문서 (`docs/*.md`) | 1 | 대기 | - |
+| D | 워크플로우 문서 (`orchestration-workflow/*.md`) | 1 | 대기 | - |
+| E | 번역 하네스 문서 및 리포트 | 6 | 완료 | 2026-04-03 |
 
-## Notes
+## 메모
 
-- `main` is the English source branch.
-- `ko` is the Korean translation branch.
-- Mark a batch complete only after translation, structural validation, and back-translation review.
+- `main`은 영어 기준 브랜치입니다.
+- `ko`는 한국어 번역 브랜치입니다.
+- 배치는 번역, 구조 검증, 역번역 검토를 마친 뒤에만 완료로 표시합니다.

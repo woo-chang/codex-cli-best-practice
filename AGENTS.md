@@ -1,67 +1,66 @@
 # AGENTS.md
 
-This file provides guidance to Codex CLI when working with code in this repository.
+이 파일은 Codex CLI가 이 저장소에서 작업할 때 따라야 할 지침을 제공합니다.
 
-## Repository Overview
+## 저장소 개요
 
-This is a best practices repository for OpenAI Codex CLI configuration, demonstrating patterns for skills, agents, orchestration workflows, and project-scoped configuration. It serves as a reference implementation rather than an application codebase.
+이 저장소는 OpenAI Codex CLI 구성을 위한 모범 사례 저장소입니다. 스킬, 에이전트, 오케스트레이션 워크플로우, 프로젝트 범위 설정 패턴을 시연하며, 애플리케이션 코드베이스라기보다 참조 구현체 역할을 합니다.
 
-## Key Components
+## 주요 구성 요소
 
-### Weather System (Example Workflow)
+### 날씨 시스템 (예제 워크플로우)
 
-A demonstration of the **Agent → Skill** orchestration pattern:
-- `weather-agent` (`.codex/agents/weather-agent.toml`): Entry point — fetches temperature from Open-Meteo API, invokes renderer skill
-- `weather-svg-creator` skill (`.agents/skills/weather-svg-creator/SKILL.md`): Invoked by agent — creates SVG weather card
+**Agent → Skill** 오케스트레이션 패턴을 보여주는 예제입니다.
+- `weather-agent` (`.codex/agents/weather-agent.toml`): 진입점. Open-Meteo API에서 기온을 가져오고 렌더러 스킬을 호출합니다
+- `weather-svg-creator` skill (`.agents/skills/weather-svg-creator/SKILL.md`): 에이전트가 호출하며 SVG 날씨 카드를 생성합니다
 
-The orchestration flow: agent fetches temperature from Open-Meteo (using caller-provided unit, defaults to Celsius), then invokes `/weather-svg-creator` to render the SVG output. See `orchestration-workflow/orchestration-workflow.md` for the complete flow diagram.
+오케스트레이션 흐름은 다음과 같습니다. 에이전트가 Open-Meteo에서 기온을 가져오고, 호출자가 지정한 단위를 사용하며 기본값은 Celsius입니다. 이후 `/weather-svg-creator`를 호출해 SVG 출력을 렌더링합니다. 전체 흐름도는 `orchestration-workflow/orchestration-workflow.md`를 참고하세요.
 
-### Skill Definition Structure
+### 스킬 정의 구조
 
-Skills live in `.agents/skills/<name>/SKILL.md` and use YAML frontmatter:
-- `name`: Display name (defaults to directory name)
-- `description`: When to invoke the skill (used for auto-discovery)
+스킬은 `.agents/skills/<name>/SKILL.md`에 위치하며 YAML 프론트매터를 사용합니다.
+- `name`: 표시 이름. 기본값은 디렉토리 이름입니다
+- `description`: 스킬을 언제 호출할지 설명하며 자동 발견에 사용됩니다
 
-Each skill directory may also contain:
-- `scripts/`: Executable code the skill invokes
-- `references/`: Documentation the skill references
-- `assets/`: Templates, resources, or static files
-- `agents/openai.yaml`: Optional appearance and dependency metadata
+각 스킬 디렉토리에는 다음이 추가로 포함될 수 있습니다.
+- `scripts/`: 스킬이 호출하는 실행 코드
+- `references/`: 스킬이 참조하는 문서
+- `assets/`: 템플릿, 리소스, 정적 파일
+- `agents/openai.yaml`: 선택적 외형 및 의존성 메타데이터
 
-Codex discovers skills via progressive disclosure — it starts with metadata and loads full instructions only when a skill is activated.
+Codex는 progressive disclosure 방식으로 스킬을 발견합니다. 먼저 메타데이터만 읽고, 스킬이 실제로 활성화될 때만 전체 지침을 불러옵니다.
 
-### Configuration System
+### 설정 시스템
 
-Codex CLI uses TOML-based configuration at two levels:
-- **User-level**: `~/.codex/config.toml` — personal defaults across all projects
-- **Project-level**: `.codex/config.toml` — team-shared, project-scoped overrides (loaded only when the project is trusted)
+Codex CLI는 두 수준의 TOML 기반 설정을 사용합니다.
+- **User-level**: `~/.codex/config.toml` — 모든 프로젝트에 적용되는 개인 기본값
+- **Project-level**: `.codex/config.toml` — 팀이 공유하는 프로젝트 범위 재정의. 프로젝트가 trusted 상태일 때만 로드됩니다
 
-### Configuration Hierarchy
+### 설정 우선순위
 
-1. `.codex/config.toml`: Team-shared project settings (checked in)
-2. `~/.codex/config.toml`: Personal user-level settings
-3. CLI flags (`--model`, `--ask-for-approval`, `--sandbox`): Override both config files
-4. `--config key=value`: One-off overrides from the command line
+1. `.codex/config.toml`: 팀이 공유하는 프로젝트 설정(버전 관리에 포함)
+2. `~/.codex/config.toml`: 개인 사용자 수준 설정
+3. CLI flags (`--model`, `--ask-for-approval`, `--sandbox`): 두 설정 파일을 모두 덮어씀
+4. `--config key=value`: 커맨드라인에서 한 번만 적용하는 재정의
 
-### Agents and Skills
+### 에이전트와 스킬
 
-Skills are discovered from multiple scopes in order of precedence:
-1. `$CWD/.agents/skills` — current working directory (most specific)
-2. `$CWD/../.agents/skills` — parent directories up to repo root
-3. `$REPO_ROOT/.agents/skills` — repository root
-4. `$HOME/.agents/skills` — user-level personal skills
-5. `/etc/codex/skills` — system/admin-level shared skills
+스킬은 다음 우선순위에 따라 여러 범위에서 발견됩니다.
+1. `$CWD/.agents/skills` — 현재 작업 디렉토리, 가장 구체적
+2. `$CWD/../.agents/skills` — 부모 디렉토리를 따라 repo root까지
+3. `$REPO_ROOT/.agents/skills` — 저장소 루트
+4. `$HOME/.agents/skills` — 사용자 수준 개인 스킬
+5. `/etc/codex/skills` — 시스템/관리자 수준 공유 스킬
 
-Agents are registered under `[agents.<name>]` in `.codex/config.toml` and can
-optionally point to dedicated role files in `.codex/agents/*.toml`.
+에이전트는 `.codex/config.toml`의 `[agents.<name>]` 아래에 등록하며, 필요하면 `.codex/agents/*.toml`의 전용 역할 파일을 가리킬 수 있습니다.
 
-## AGENTS.md Discovery
+## AGENTS.md 탐색
 
-Codex walks from the Git root down to the current working directory, loading `AGENTS.override.md` then `AGENTS.md` in each directory. Files closer to the current directory appear later in the combined prompt and take precedence. The combined size is capped at 32 KiB by default (`project_doc_max_bytes`).
+Codex는 Git root에서 현재 작업 디렉토리까지 내려오며 각 디렉토리에서 `AGENTS.override.md`와 그다음 `AGENTS.md`를 읽습니다. 현재 디렉토리에 가까운 파일일수록 결합된 프롬프트에서 더 뒤에 들어가며 우선순위를 가집니다. 결합된 전체 크기는 기본적으로 32 KiB(`project_doc_max_bytes`)로 제한됩니다.
 
-## Profiles
+## 프로필
 
-Define named profiles in `config.toml` under `[profiles.<name>]` to switch between configurations quickly:
+`config.toml`의 `[profiles.<name>]` 아래에 이름 있는 프로필을 정의하면 설정을 빠르게 전환할 수 있습니다.
 
 ```bash
 codex --profile conservative   # read-only, asks before every action
@@ -71,49 +70,49 @@ codex --profile ci             # headless CI/CD mode
 codex --profile review         # read-only code review mode
 ```
 
-Set a default profile with `profile = "conservative"` at the top level of `config.toml`. Example profile configs are in `examples/profiles/`.
+기본 프로필은 `config.toml` 최상위에 `profile = "conservative"`로 설정합니다. 예시 프로필 구성은 `examples/profiles/`에 있습니다.
 
-## Workflow Best Practices
+## 워크플로우 모범 사례
 
-From experience with this repository:
+이 저장소 운영 경험상 다음을 권장합니다.
 
-- Keep AGENTS.md under 150 lines for reliable adherence
-- Use skills with clear `name` and `description` frontmatter for auto-discovery
-- Organize skills by feature domain (e.g., `weather-svg-creator`)
-- Use profiles to switch between safety levels (`conservative` for review, `trusted` for development)
-- Use `AGENTS.override.md` for personal preferences without affecting the team
-- Break complex tasks into composable skills rather than monolithic instructions
+- AGENTS.md는 신뢰성 있는 준수를 위해 150줄 이하로 유지합니다
+- 자동 발견을 위해 `name`과 `description` 프론트매터가 명확한 스킬을 사용합니다
+- 스킬은 기능 도메인 기준으로 구성합니다. 예: `weather-svg-creator`
+- 안전 수준 전환에는 프로필을 사용합니다. 예: 검토용 `conservative`, 개발용 `trusted`
+- 팀에 영향을 주지 않는 개인 선호는 `AGENTS.override.md`를 사용합니다
+- 복잡한 작업은 거대한 지침 하나보다 조합 가능한 스킬들로 나눕니다
 
-### Sandbox Modes
+### 샌드박스 모드
 
-- `read-only`: Only reads files, no writes or network access
-- `workspace-write`: Reads and writes within the project, sandboxed network
-- `danger-full-access`: Unrestricted access (use with caution)
+- `read-only`: 파일 읽기만 가능하며 쓰기와 네트워크 접근은 불가
+- `workspace-write`: 프로젝트 안에서 읽기/쓰기가 가능하며 네트워크는 샌드박스 처리됨
+- `danger-full-access`: 제한 없는 접근. 주의해서 사용
 
-### Approval Policies
+### 승인 정책
 
-- `untrusted`: Only safe read commands auto-approved; everything else asks
-- `on-request`: Model decides when to ask for approval (recommended default)
-- `never`: All commands auto-approved; failures returned to model directly
+- `untrusted`: 안전한 읽기 명령만 자동 승인되고 나머지는 모두 확인을 요청
+- `on-request`: 모델이 언제 승인을 요청할지 결정. 권장 기본값
+- `never`: 모든 명령이 자동 승인되며 실패는 모델에 바로 반환됨
 
-## MCP Servers
+## MCP 서버
 
-MCP servers are configured under `[mcp_servers.*]` in `.codex/config.toml`. Currently configured:
-- `context7`: Documentation lookup via `@upstash/context7-mcp@latest`
+MCP 서버는 `.codex/config.toml`의 `[mcp_servers.*]` 아래에 설정합니다. 현재는 다음이 구성돼 있습니다.
+- `context7`: `@upstash/context7-mcp@latest`를 통한 문서 조회
 
-## Documentation
+## 문서
 
-- `best-practice/codex-agents-md.md`: AGENTS.md authoring guide
-- `best-practice/codex-config.md`: Config, profiles, and MCP layout
-- `best-practice/codex-mcp.md`: MCP servers best practices
-- `best-practice/codex-skills.md`: Skills best practices
-- `best-practice/codex-subagents.md`: Subagents guide
-- `docs/SKILLS.md`: Skills system reference
+- `best-practice/codex-agents-md.md`: AGENTS.md 작성 가이드
+- `best-practice/codex-config.md`: 설정, 프로필, MCP 구조
+- `best-practice/codex-mcp.md`: MCP 서버 모범 사례
+- `best-practice/codex-skills.md`: 스킬 모범 사례
+- `best-practice/codex-subagents.md`: 서브에이전트 가이드
+- `docs/SKILLS.md`: 스킬 시스템 레퍼런스
 - `translation-harness/README.md`: 한국어 번역 워크플로우, 범위, 검증 루프
 - `translation-harness/translation-targets.md`: 번역 대상 배치와 재번역 식별 규칙
 - `translation-harness/commit-policy.md`: 한글 커밋 메시지와 커밋 전 검증 규칙
-- `orchestration-workflow/orchestration-workflow.md`: Weather system flow diagram
-- `examples/`: Example profile configs and CI/CD setup
+- `orchestration-workflow/orchestration-workflow.md`: 날씨 시스템 흐름도
+- `examples/`: 예시 프로필 구성과 CI/CD 설정
 
 ## Translation Harness
 
