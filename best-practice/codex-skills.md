@@ -1,12 +1,12 @@
-# Best Practice: Skills
+# 모범 사례: Skills
 
-Skills are the primary mechanism for extending Codex CLI with reusable, composable instruction packages. They follow the SKILL.md open standard.
+Skills는 재사용 가능하고 조합 가능한 instruction package로 Codex CLI를 확장하는 기본 메커니즘입니다. 이들은 SKILL.md 공개 표준을 따릅니다.
 
-## Two Skill Patterns
+## 두 가지 Skill 패턴
 
-### 1. User-Invocable Skills (Slash Commands)
+### 1. 사용자 호출형 Skills (Slash Commands)
 
-Triggered explicitly by the user via `/skill-name`:
+사용자가 `/skill-name`으로 명시적으로 호출합니다.
 
 ```yaml
 ---
@@ -17,12 +17,11 @@ allowed-tools: Bash, Read
 ---
 ```
 
-**Best for**: Workflows the user triggers on demand (deploy, review, generate).
+**적합한 경우**: 사용자가 필요할 때 직접 실행하는 워크플로우. 예: deploy, review, generate
 
-### 2. Agent-Preloaded Skills (Background Knowledge)
+### 2. 에이전트 사전 로드 Skills (배경 지식)
 
-Defined as regular skills, then attached to an agent through the current
-agent configuration model:
+일반 skill로 정의한 뒤, 현재 에이전트 설정 모델을 통해 에이전트에 연결합니다.
 
 ```toml
 # .codex/config.toml
@@ -41,44 +40,44 @@ Work on backend APIs for this project.
 """
 ```
 
-**Best for**: Domain knowledge that agents need but users never invoke directly.
+**적합한 경우**: 에이전트는 필요하지만 사용자가 직접 호출하지는 않는 도메인 지식
 
-## Frontmatter Guidelines
+## 프론트매터 가이드
 
-### Write Descriptive `description` Fields
-The description drives auto-discovery. Be specific about when the skill should be used:
+### 설명적인 `description` 필드 작성
+description은 auto-discovery를 좌우합니다. 언제 이 skill을 써야 하는지 구체적으로 적어야 합니다.
 
 ```yaml
-# Good: specific trigger condition
+# Good: 구체적인 트리거 조건
 description: Review TypeScript files for type safety issues and suggest fixes
 
-# Bad: vague, matches too many contexts
+# Bad: 모호해서 너무 많은 맥락에 걸림
 description: Help with TypeScript
 ```
 
-### Scope `allowed-tools` Tightly
-Only grant tools the skill actually needs:
+### `allowed-tools`는 좁게 제한
+skill이 실제로 필요한 도구만 허용합니다.
 
 ```yaml
-# Good: minimal permissions
+# Good: 최소 권한
 allowed-tools: Read, Grep, Glob
 
-# Bad: overly permissive
+# Bad: 지나치게 넓은 권한
 allowed-tools: Bash, Read, Write, Edit, Glob, Grep, WebFetch
 ```
 
-### Choose the Right Model
-Use cheaper models for simple tasks:
+### 적절한 모델 선택
+단순 작업에는 더 저렴한 모델을 사용합니다.
 
 ```yaml
-# Fast analysis tasks
+# 빠른 분석 작업
 model: o4-mini
 
-# Complex reasoning tasks
+# 복잡한 추론 작업
 model: o3
 ```
 
-## Skill Organization
+## Skill 구성
 
 ```
 .agents/skills/
@@ -92,14 +91,14 @@ model: o3
     SKILL.md
 ```
 
-### Naming Conventions
-- Use kebab-case for directory names: `pr-review`, not `prReview`
-- Keep names short but descriptive
-- Avoid generic names like `helper` or `utils`
+### 이름 규칙
+- 디렉토리 이름은 kebab-case 사용: `pr-review`, `prReview`는 지양
+- 이름은 짧되 설명 가능해야 함
+- `helper`, `utils` 같은 일반적인 이름은 피함
 
-## String Substitutions
+## 문자열 치환
 
-Use `$ARGUMENTS` for the full argument string, `$0` for the first positional arg:
+전체 인자 문자열에는 `$ARGUMENTS`, 첫 번째 위치 인자에는 `$0`를 사용합니다.
 
 ```markdown
 ---
@@ -115,10 +114,10 @@ Fetch issue #$0 from GitHub and implement a fix:
 3. Implement and test the fix
 ```
 
-## Composing Skills
+## Skills 조합
 
-### Skill Chains via Commands
-Use a command to orchestrate multiple skills:
+### Commands를 통한 Skill 체인
+하나의 command로 여러 skills를 오케스트레이션할 수 있습니다.
 
 ```markdown
 <!-- commands/full-review.md -->
@@ -128,7 +127,7 @@ Use a command to orchestrate multiple skills:
 ```
 
 ### Agent + Skills
-Agents with preloaded skills get domain expertise without user intervention:
+사전 로드된 skills를 가진 에이전트는 사용자 개입 없이 도메인 지식을 활용할 수 있습니다.
 
 ```toml
 # .codex/config.toml
@@ -143,12 +142,12 @@ model = "o4-mini"
 skills = ["api-conventions", "database-patterns", "error-handling"]
 ```
 
-## Anti-Patterns
+## 안티패턴
 
-| Anti-Pattern | Fix |
+| 안티패턴 | 해결책 |
 |---|---|
-| Putting all instructions in AGENTS.md | Extract into focused skills |
-| Skills longer than 100 lines | Split into multiple skills or use linked docs |
-| Skills that do everything | One skill, one responsibility |
-| Forgetting `user-invocable: false` for knowledge skills | Always set for agent-only skills |
-| Hardcoding values that vary by environment | Use `$ARGUMENTS` for dynamic values |
+| 모든 지침을 AGENTS.md에 넣기 | 집중된 skills로 분리 |
+| 100줄이 넘는 skills | 여러 skills로 나누거나 링크 문서 사용 |
+| 모든 걸 다 하는 skills | 하나의 skill은 하나의 책임만 |
+| 지식용 skills에 `user-invocable: false`를 빼먹기 | 에이전트 전용 skill에는 항상 설정 |
+| 환경별로 달라지는 값을 하드코딩하기 | 동적 값에는 `$ARGUMENTS` 사용 |

@@ -1,25 +1,25 @@
-# Best Practice: Config
+# 모범 사례: Config
 
-A comprehensive guide to Codex CLI's TOML-based configuration system — covering config hierarchy, profiles, sandbox modes, and approval policies.
+Codex CLI의 TOML 기반 설정 시스템을 다루는 종합 가이드입니다. 설정 우선순위, 프로필, 샌드박스 모드, 승인 정책을 포함합니다.
 
 <table width="100%">
 <tr>
-<td><a href="../">← Back to Codex CLI Best Practice</a></td>
+<td><a href="../">← Codex CLI 모범 사례로 돌아가기</a></td>
 <td align="right"><img src="../!/codex-jumping.svg" alt="Codex" width="60" /></td>
 </tr>
 </table>
 
-## Settings Hierarchy
+## 설정 우선순위
 
-Settings apply in order of precedence (highest to lowest):
+설정은 다음 우선순위로 적용됩니다. 위에서 아래 순입니다.
 
-| Priority | Location | Scope | Purpose |
+| 우선순위 | 위치 | 범위 | 목적 |
 |----------|----------|-------|---------|
-| 1 | CLI flags / `-c key=value` | Invocation | One-off overrides for a single run |
-| 2 | `.codex/config.toml` | Project | Team-shared defaults, profiles, MCP, agents |
-| 3 | `~/.codex/config.toml` | Global | Personal defaults across projects |
+| 1 | CLI flags / `-c key=value` | Invocation | 단일 실행에만 적용되는 일회성 재정의 |
+| 2 | `.codex/config.toml` | Project | 팀 공유 기본값, profiles, MCP, agents |
+| 3 | `~/.codex/config.toml` | Global | 여러 프로젝트에 걸친 개인 기본값 |
 
-## Core Configuration
+## 핵심 설정
 
 ```toml
 # .codex/config.toml
@@ -28,9 +28,9 @@ sandbox_mode = "workspace-write"
 approval_policy = "on-request"
 ```
 
-## Profiles
+## 프로필
 
-Named presets under `[profiles.<name>]` — switch with `codex --profile <name>`:
+`[profiles.<name>]` 아래에 이름 있는 프리셋을 두고 `codex --profile <name>`로 전환합니다.
 
 ```toml
 [profiles.conservative]
@@ -51,31 +51,31 @@ sandbox_mode = "danger-full-access"
 approval_policy = "never"
 ```
 
-Set a default profile with `profile = "conservative"` at the top level.
+기본 프로필은 최상위에 `profile = "conservative"`로 설정합니다.
 
-## Sandbox Modes
+## 샌드박스 모드
 
-| Mode | File Access | Network | Best for |
+| 모드 | 파일 접근 | 네트워크 | 적합한 용도 |
 |---|---|---|---|
-| `read-only` | Read-only project access | Blocked | Reviews, audits, CI analysis |
-| `workspace-write` | Read/write inside the workspace | Blocked | Local development and doc/code edits |
-| `danger-full-access` | Unrestricted filesystem access | Allowed | Fully trusted automation that needs network or installs |
+| `read-only` | 프로젝트 읽기 전용 접근 | 차단 | 리뷰, 감사, CI 분석 |
+| `workspace-write` | 워크스페이스 내부 읽기/쓰기 | 차단 | 로컬 개발, 문서/코드 수정 |
+| `danger-full-access` | 제한 없는 파일시스템 접근 | 허용 | 네트워크나 설치가 필요한 완전 신뢰 자동화 |
 
-## Approval Policies
+## 승인 정책
 
-| Policy | Behavior | Best for |
+| 정책 | 동작 | 적합한 용도 |
 |---|---|---|
-| `untrusted` | Auto-runs only trusted read-style commands; asks for the rest | New repos, audits, reviews |
-| `on-request` | Model decides when it should ask | Everyday development |
-| `never` | Never asks; failures come straight back to the model | Non-interactive runs and tightly controlled automation |
+| `untrusted` | 신뢰 가능한 읽기 계열 명령만 자동 실행하고 나머지는 모두 묻습니다 | 새 repo, 감사, 리뷰 |
+| `on-request` | 언제 물어볼지 모델이 결정합니다 | 일상적인 개발 |
+| `never` | 절대 묻지 않으며 실패는 그대로 모델에 반환됩니다 | 비대화형 실행, 엄격히 통제된 자동화 |
 
 ## Override
 
-Use `AGENTS.override.md` for personal instruction overrides — loaded before `AGENTS.md`, not committed to git.
+개인용 지시 재정의는 `AGENTS.override.md`를 사용합니다. `AGENTS.md`보다 먼저 로드되며 git에는 커밋하지 않습니다.
 
-## MCP Servers
+## MCP 서버
 
-Declare shared integrations in the same config file:
+공유 integration은 같은 설정 파일에서 선언합니다.
 
 ```toml
 [mcp_servers.github]
@@ -84,9 +84,9 @@ args = ["-y", "@modelcontextprotocol/server-github"]
 env = { GITHUB_TOKEN = "$GITHUB_TOKEN" }
 ```
 
-## Agents
+## 에이전트
 
-Register agents under `[agents.<name>]` and optionally point them at dedicated role files:
+에이전트는 `[agents.<name>]` 아래에 등록하고, 필요하면 전용 역할 파일을 가리키게 할 수 있습니다.
 
 ```toml
 [agents.backend-dev]
@@ -94,16 +94,16 @@ description = "Handles backend implementation tasks"
 config_file = "agents/backend-dev.toml"
 ```
 
-## One-Off Overrides
+## 일회성 재정의
 
 ```bash
 codex -c model=\"o3\" -c approval_policy=\"never\" exec "summarize this diff"
 ```
 
-## Anti-Patterns
+## 안티패턴
 
-- Using `danger-full-access` for ordinary editing tasks
-- Treating `never` as a general-purpose local default
-- Using `danger-full-access` and `never` together without a real containment boundary
-- Hardcoding secrets instead of using `$ENV_VAR` expansion
-- Mixing unrelated concerns into one profile instead of creating focused profiles
+- 일반적인 편집 작업에 `danger-full-access`를 사용하는 것
+- `never`를 범용 로컬 기본값처럼 사용하는 것
+- 실제 격리 경계 없이 `danger-full-access`와 `never`를 함께 사용하는 것
+- `$ENV_VAR` 확장 대신 비밀값을 하드코딩하는 것
+- 집중된 프로필을 만들지 않고 관련 없는 관심사를 하나의 프로필에 섞는 것

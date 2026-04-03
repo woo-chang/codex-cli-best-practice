@@ -1,23 +1,23 @@
-# Best Practice: Subagents
+# 모범 사례: Subagents
 
-Subagents let Codex spawn specialized agents in parallel to tackle complex, highly parallel tasks — such as codebase exploration or multi-step feature plans — then collect their results in one response.
+Subagents는 Codex가 특화된 에이전트를 병렬로 띄워 복잡하고 병렬성이 높은 작업을 처리하게 해줍니다. 예를 들어 코드베이스 탐색이나 다단계 기능 계획을 나눠 수행한 뒤, 결과를 하나의 응답으로 모을 수 있습니다.
 
-With subagent workflows you can also define custom agents with different model configurations and instructions depending on the task.
+subagent workflow를 사용하면 작업 성격에 맞게 서로 다른 모델 설정과 지시를 가진 custom agent도 정의할 수 있습니다.
 
-## When to Use Subagents
+## 언제 Subagents를 사용할까
 
-Subagents are ideal for tasks that are:
+Subagents는 다음과 같은 작업에 적합합니다.
 - **Highly parallel** — multiple independent review or exploration threads
 - **Domain-specialized** — different tasks need different models, tools, or instructions
 - **Large-scope** — reviewing a full PR across security, quality, tests, etc.
 
-Codex only spawns subagents when you explicitly ask it to. Each subagent does its own model and tool work, so subagent workflows consume more tokens than single-agent runs.
+Codex는 사용자가 명시적으로 요청할 때만 subagent를 띄웁니다. 각 subagent는 자체적으로 모델과 도구를 사용하므로, subagent workflow는 단일 agent 실행보다 더 많은 토큰을 소비합니다.
 
-## Typical Workflow
+## 일반적인 워크플로우
 
-Codex handles orchestration: spawning subagents, routing follow-up instructions, waiting for results, and closing threads. When many agents are running, Codex waits until all results are available before returning a consolidated response.
+Codex는 오케스트레이션을 담당합니다. subagent를 띄우고, 후속 지시를 전달하고, 결과를 기다리고, 스레드를 닫습니다. 여러 에이전트가 동시에 실행될 때는 모든 결과가 준비될 때까지 기다렸다가 통합 응답을 반환합니다.
 
-**Try this prompt on your project:**
+**프로젝트에서 이런 프롬프트를 시도해볼 수 있습니다.**
 
 ```
 I would like to review the following points on the current PR (this branch vs main).
@@ -30,72 +30,72 @@ Spawn one agent per point, wait for all of them, and summarize the result for ea
 6. Maintainability of the code
 ```
 
-## Managing Subagents
+## Subagents 관리
 
-- Use `/agent` in the CLI to switch between active agent threads and inspect ongoing work
-- Ask Codex directly to steer a running subagent, stop it, or close completed threads
+- CLI의 `/agent`를 사용해 활성 agent thread 사이를 전환하고 진행 중인 작업을 확인합니다
+- 실행 중인 subagent의 방향을 조정하거나, 중지하거나, 완료된 thread를 닫으라고 Codex에 직접 지시할 수 있습니다
 
-## Approvals and Sandbox Controls
+## 승인과 샌드박스 제어
 
-Subagents inherit your current sandbox policy.
+Subagents는 현재 샌드박스 정책을 상속합니다.
 
-- In interactive CLI sessions, approval requests can surface from inactive threads. The overlay shows the source thread label — press `o` to open that thread before you approve/reject.
-- In non-interactive flows, actions needing new approval fail and Codex surfaces the error to the parent workflow.
-- Codex reapplies the parent turn's live runtime overrides (sandbox, `/approvals` changes, `--yolo`) when spawning children, even if a custom agent file sets different defaults.
-- You can override sandbox config per custom agent (e.g., mark one as read-only).
+- 대화형 CLI 세션에서는 비활성 thread에서 승인 요청이 올라올 수 있습니다. 오버레이에 소스 thread 라벨이 표시되며, 승인/거부 전에 `o`로 해당 thread를 열 수 있습니다
+- 비대화형 흐름에서는 새 승인이 필요한 동작이 실패하고, Codex가 그 오류를 부모 workflow에 전달합니다
+- custom agent 파일에 다른 기본값이 있어도, Codex는 자식 agent를 만들 때 부모 turn의 실시간 runtime override(sandbox, `/approvals` 변경, `--yolo`)를 다시 적용합니다
+- custom agent별로 샌드박스 설정을 따로 재정의할 수도 있습니다. 예: 특정 agent만 read-only
 
 ## Built-in Agents
 
-Codex ships with three built-in agents:
+Codex에는 세 가지 built-in agent가 포함됩니다.
 
-| Agent | Purpose |
+| 에이전트 | 용도 |
 |-------|---------|
-| `default` | General-purpose fallback |
-| `worker` | Execution-focused for implementation and fixes |
-| `explorer` | Read-heavy codebase exploration |
+| `default` | 범용 fallback |
+| `worker` | 구현과 수정 중심의 실행 담당 |
+| `explorer` | 읽기 중심 코드베이스 탐색 |
 
 ## Custom Agents
 
-Define custom agents as standalone TOML files:
+custom agent는 독립 TOML 파일로 정의합니다.
 - `~/.codex/agents/` — personal agents
 - `.codex/agents/` — project-scoped agents
 
-Each file defines one agent and can override the same settings as a normal Codex session config.
+각 파일은 하나의 agent를 정의하며, 일반 Codex 세션 설정과 동일한 항목을 재정의할 수 있습니다.
 
-### Required Fields
+### 필수 필드
 
-Every custom agent must define:
+모든 custom agent는 다음을 반드시 정의해야 합니다.
 
-| Field | Type | Purpose |
+| 필드 | 타입 | 목적 |
 |-------|------|---------|
-| `name` | string | Agent name Codex uses when spawning |
-| `description` | string | When Codex should use this agent |
-| `developer_instructions` | string | Core behavior instructions |
+| `name` | string | Codex가 spawn할 때 사용하는 agent 이름 |
+| `description` | string | Codex가 언제 이 agent를 써야 하는지 |
+| `developer_instructions` | string | 핵심 행동 지침 |
 
-### Optional Fields
+### 선택 필드
 
-These inherit from the parent session when omitted:
+다음 항목은 생략하면 부모 세션에서 상속됩니다.
 
-- `nickname_candidates` — display nicknames for spawned instances
-- `model` — model override
-- `model_reasoning_effort` — reasoning effort level
-- `sandbox_mode` — sandbox override (e.g., `read-only`)
-- `mcp_servers` — MCP server connections
-- `skills.config` — skill configurations
+- `nickname_candidates` — spawn된 인스턴스에 표시할 별명
+- `model` — 모델 override
+- `model_reasoning_effort` — 추론 effort 수준
+- `sandbox_mode` — 샌드박스 override. 예: `read-only`
+- `mcp_servers` — MCP 서버 연결
+- `skills.config` — skill 설정
 
-### Global Subagent Settings
+### 전역 Subagent 설정
 
-Configure in your `config.toml` under `[agents]`:
+`config.toml`의 `[agents]` 아래에서 설정합니다.
 
-| Field | Default | Purpose |
+| 필드 | 기본값 | 목적 |
 |-------|---------|---------|
-| `agents.max_threads` | 6 | Concurrent open agent thread cap |
-| `agents.max_depth` | 1 | Spawned agent nesting depth (root = 0) |
-| `agents.job_max_runtime_seconds` | 1800 | Default timeout per worker for CSV jobs |
+| `agents.max_threads` | 6 | 동시에 열 수 있는 agent thread 상한 |
+| `agents.max_depth` | 1 | spawn된 agent의 중첩 깊이 (root = 0) |
+| `agents.job_max_runtime_seconds` | 1800 | CSV 작업에서 worker별 기본 timeout |
 
-### Display Nicknames
+### 표시용 별명
 
-Use `nickname_candidates` for readable labels when running many instances of the same agent:
+같은 agent 인스턴스를 많이 실행할 때 읽기 쉬운 라벨을 위해 `nickname_candidates`를 사용합니다.
 
 ```toml
 name = "reviewer"
@@ -107,21 +107,21 @@ Prioritize correctness, security, behavior regressions, and missing test coverag
 nickname_candidates = ["Atlas", "Delta", "Echo"]
 ```
 
-Nicknames are presentation-only — Codex still identifies agents by `name`.
+별명은 표시용일 뿐이며, Codex는 여전히 `name`으로 agent를 식별합니다.
 
-### Best Practices for Custom Agents
+### Custom Agents 모범 사례
 
-The best custom agents are **narrow and opinionated**:
-- Give each one a clear, single job
-- Match the tool surface to that job
-- Write instructions that prevent drifting into adjacent work
-- If a custom agent name matches a built-in (e.g., `explorer`), the custom agent takes precedence
+좋은 custom agent는 **좁고 분명한 의견**을 가집니다.
+- 각 agent에 명확한 단일 역할을 부여합니다
+- 해당 역할에 맞는 도구 표면만 제공합니다
+- 인접한 작업으로 번지지 않도록 지시를 작성합니다
+- custom agent 이름이 built-in과 같으면(예: `explorer`) custom agent가 우선합니다
 
-## Example: PR Review Pattern
+## 예시: PR 리뷰 패턴
 
-Split review across three focused agents:
+리뷰를 세 개의 집중된 agent로 나눕니다.
 
-**Project config (`.codex/config.toml`):**
+**프로젝트 설정 (`.codex/config.toml`):**
 ```toml
 [agents]
 max_threads = 6
@@ -175,16 +175,16 @@ Do not make code changes.
 url = "https://developers.openai.com/mcp"
 ```
 
-**Prompt:**
+**프롬프트:**
 ```
 Review this branch against main. Have pr_explorer map the affected code paths,
 reviewer find real risks, and docs_researcher verify the framework APIs
 that the patch relies on.
 ```
 
-## Example: Frontend Integration Debugging
+## 예시: 프론트엔드 통합 디버깅
 
-Three agents for UI regressions and cross-stack bugs:
+UI 회귀와 cross-stack 버그를 위한 세 agent 예시입니다.
 
 **`.codex/agents/code-mapper.toml`:**
 ```toml
@@ -241,18 +241,18 @@ code_mapper trace the responsible code path, and ui_fixer implement the smallest
 once the failure mode is clear.
 ```
 
-## CSV Batch Processing (Experimental)
+## CSV 배치 처리 (Experimental)
 
-Use `spawn_agents_on_csv` for many similar tasks that map to one row per work item. Codex reads the CSV, spawns one worker per row, waits for the batch to finish, and exports combined results.
+하나의 작업 항목이 한 행에 대응되는 유사 작업이 많을 때는 `spawn_agents_on_csv`를 사용합니다. Codex는 CSV를 읽고, 행마다 worker를 띄우고, 배치가 끝날 때까지 기다린 뒤, 결과를 합쳐 내보냅니다.
 
-**Good for:**
+**적합한 경우:**
 - Reviewing one file, package, or service per row
 - Checking lists of incidents, PRs, or migration targets
 - Generating structured summaries for many similar inputs
 
-**Parameters:**
+**파라미터:**
 
-| Parameter | Purpose |
+| 파라미터 | 목적 |
 |-----------|---------|
 | `csv_path` | Source CSV |
 | `instruction` | Worker prompt template with `{column_name}` placeholders |
@@ -262,9 +262,9 @@ Use `spawn_agents_on_csv` for many similar tasks that map to one row per work it
 | `max_concurrency` | Parallel worker limit |
 | `max_runtime_seconds` | Per-worker timeout |
 
-Each worker must call `report_agent_job_result` exactly once — if a worker exits without reporting, Codex marks that row with an error.
+각 worker는 반드시 `report_agent_job_result`를 정확히 한 번 호출해야 합니다. 보고 없이 종료되면 Codex는 해당 행을 오류로 표시합니다.
 
-**Example prompt:**
+**예시 프롬프트:**
 ```
 Create /tmp/components.csv with columns path,owner and one row per frontend component.
 

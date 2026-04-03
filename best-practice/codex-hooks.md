@@ -1,47 +1,47 @@
-# Best Practice: Hooks
+# 모범 사례: Hooks
 
-Hooks are an extensibility framework that inject custom scripts into the Codex agentic loop — enabling deterministic automation for logging, security scanning, validation, conversation summarization, and context-aware prompting.
+Hooks는 Codex agentic loop에 custom script를 주입하는 확장 프레임워크입니다. 이를 통해 로깅, 보안 스캔, 검증, 대화 요약, 문맥 인식 프롬프팅을 결정적으로 자동화할 수 있습니다.
 
 <table width="100%">
 <tr>
-<td><a href="../">← Back to Codex CLI Best Practice</a></td>
+<td><a href="../">← Codex CLI 모범 사례로 돌아가기</a></td>
 <td align="right"><img src="../!/codex-jumping.svg" alt="Codex" width="60" /></td>
 </tr>
 </table>
 
-> **Status:** Experimental — under active development. Windows support temporarily disabled.
+> **상태:** Experimental 단계이며 활발히 개발 중입니다. Windows 지원은 일시적으로 비활성화되어 있습니다.
 
 ## Feature Flag
 
-Hooks require enabling in `config.toml`:
+Hooks를 쓰려면 `config.toml`에서 기능을 켜야 합니다.
 
 ```toml
 [features]
 codex_hooks = true
 ```
 
-## Discovery Locations
+## 탐색 위치
 
-Codex discovers `hooks.json` files at two levels — both load simultaneously; higher-precedence layers don't replace lower-precedence hooks:
+Codex는 두 수준에서 `hooks.json` 파일을 찾습니다. 두 파일은 동시에 로드되며, 우선순위가 높은 계층이 낮은 계층을 대체하지는 않습니다.
 
-| Priority | Location | Scope |
+| 우선순위 | 위치 | 범위 |
 |----------|----------|-------|
-| 1 | `.codex/hooks.json` | Project (team-shared) |
-| 2 | `~/.codex/hooks.json` | Global (personal) |
+| 1 | `.codex/hooks.json` | Project (팀 공유) |
+| 2 | `~/.codex/hooks.json` | Global (개인) |
 
-## Hook Events
+## Hook 이벤트
 
-| Event | Matcher | Description |
+| 이벤트 | Matcher | 설명 |
 |-------|---------|-------------|
-| `SessionStart` | `startup \| resume` | Runs at session initialization |
-| `PreToolUse` | `Bash` | Intercepts tool execution before running (Bash only) |
-| `PostToolUse` | `Bash` | Reviews tool results after execution (Bash only) |
-| `UserPromptSubmit` | Not supported | Runs when user submits a prompt |
-| `Stop` | Not supported | Runs when a turn completes — determines whether to continue |
+| `SessionStart` | `startup \| resume` | 세션 초기화 시 실행 |
+| `PreToolUse` | `Bash` | 도구 실행 전에 가로챔. 현재는 Bash만 지원 |
+| `PostToolUse` | `Bash` | 도구 실행 결과를 사후 검토. 현재는 Bash만 지원 |
+| `UserPromptSubmit` | 지원 안 됨 | 사용자가 프롬프트를 제출할 때 실행 |
+| `Stop` | 지원 안 됨 | 한 턴이 끝날 때 실행되며 계속 진행할지 판단 |
 
-## Configuration Structure
+## 설정 구조
 
-Hooks organize into three levels: **event → matcher group → hook handlers**
+Hooks는 **event → matcher group → hook handlers**의 세 단계로 구성됩니다.
 
 ```json
 {
@@ -63,30 +63,30 @@ Hooks organize into three levels: **event → matcher group → hook handlers**
 }
 ```
 
-### Key Options
+### 주요 옵션
 
-| Option | Default | Description |
+| 옵션 | 기본값 | 설명 |
 |--------|---------|-------------|
-| `timeout` / `timeoutSec` | 600s | Execution time limit in seconds |
-| `statusMessage` | — | Optional UI feedback during execution |
-| `matcher` | Match all | Regex to filter event firing (`"*"`, `""`, or omit for all) |
+| `timeout` / `timeoutSec` | 600s | 초 단위 실행 시간 제한 |
+| `statusMessage` | — | 실행 중 표시할 선택적 UI 피드백 |
+| `matcher` | 전체 매치 | 이벤트 발동을 필터링하는 regex (`"*"`, `""`, 또는 생략 시 전체) |
 
-## Runtime Behavior
+## 런타임 동작
 
-- Matching hooks from multiple files all execute
-- Multiple command hooks for the same event launch **concurrently**
-- One hook cannot prevent another from running
-- Commands run with session `cwd` as working directory
+- 여러 파일에서 매치된 hooks는 모두 실행됩니다
+- 동일 이벤트의 여러 command hook은 **동시에** 실행됩니다
+- 하나의 hook이 다른 hook의 실행을 막을 수는 없습니다
+- 명령은 세션의 `cwd`를 작업 디렉토리로 사용합니다
 
-## Hook Events Deep Dive
+## Hook 이벤트 상세
 
 ### SessionStart
 
-Injects context at session initialization.
+세션 초기화 시 컨텍스트를 주입합니다.
 
-**Input fields:** `source`, `session_id`, `transcript_path`, `cwd`, `hook_event_name`, `model`
+**입력 필드:** `source`, `session_id`, `transcript_path`, `cwd`, `hook_event_name`, `model`
 
-**Output:** Plain text on stdout is added as developer context. JSON output supports:
+**출력:** stdout의 일반 텍스트는 developer context로 추가됩니다. JSON 출력은 다음 형식을 지원합니다.
 
 ```json
 {
@@ -99,13 +99,13 @@ Injects context at session initialization.
 
 ### PreToolUse
 
-Intercepts tool execution before running (currently Bash only).
+도구 실행 전에 가로챕니다. 현재는 Bash만 지원합니다.
 
-> **Note:** The model can circumvent this by writing and executing scripts directly — treat as a useful guardrail rather than a complete enforcement boundary.
+> **참고:** 모델은 스크립트를 직접 작성하고 실행해 이를 우회할 수 있습니다. 완전한 강제 경계라기보다 유용한 가드레일로 봐야 합니다.
 
-**Input fields:** `turn_id`, `tool_name`, `tool_use_id`, `tool_input.command`, plus common fields
+**입력 필드:** `turn_id`, `tool_name`, `tool_use_id`, `tool_input.command`와 공통 필드
 
-**Deny execution:**
+**실행 거부:**
 
 ```json
 {
@@ -117,15 +117,15 @@ Intercepts tool execution before running (currently Bash only).
 }
 ```
 
-**Alternative:** Exit code `2` with blocking reason on stderr.
+**대안:** stderr에 차단 이유를 출력하고 종료 코드 `2`를 반환합니다.
 
 ### PostToolUse
 
-Reviews tool results after execution (Bash only). Cannot undo side effects but can replace the tool result with feedback.
+도구 실행 후 결과를 검토합니다. 현재는 Bash만 지원합니다. 이미 발생한 부작용을 되돌릴 수는 없지만, 도구 결과를 피드백으로 대체할 수는 있습니다.
 
-**Input fields:** `turn_id`, `tool_name`, `tool_use_id`, `tool_input.command`, `tool_response`, plus common fields
+**입력 필드:** `turn_id`, `tool_name`, `tool_use_id`, `tool_input.command`, `tool_response`와 공통 필드
 
-**Block and replace result:**
+**결과 차단 및 대체:**
 
 ```json
 {
@@ -138,15 +138,15 @@ Reviews tool results after execution (Bash only). Cannot undo side effects but c
 }
 ```
 
-**Alternative:** Exit code `2` with feedback reason on stderr.
+**대안:** stderr에 피드백 이유를 출력하고 종료 코드 `2`를 반환합니다.
 
 ### UserPromptSubmit
 
-Runs when user submits a prompt. Matcher not supported.
+사용자가 프롬프트를 제출할 때 실행됩니다. Matcher는 지원되지 않습니다.
 
 **Input fields:** `turn_id`, `prompt`, plus common fields
 
-**Block submission:**
+**제출 차단:**
 
 ```json
 {
@@ -155,7 +155,7 @@ Runs when user submits a prompt. Matcher not supported.
 }
 ```
 
-**Add context:**
+**컨텍스트 추가:**
 
 ```json
 {
@@ -168,11 +168,11 @@ Runs when user submits a prompt. Matcher not supported.
 
 ### Stop
 
-Runs when a turn completes — determines whether to continue automatically. Matcher not supported.
+한 턴이 끝날 때 실행되며 자동으로 계속 진행할지 결정합니다. Matcher는 지원되지 않습니다.
 
 **Input fields:** `turn_id`, `stop_hook_active`, `last_assistant_message`, plus common fields
 
-**Continue with automatic prompt:**
+**자동 프롬프트로 계속 진행:**
 
 ```json
 {
@@ -181,43 +181,43 @@ Runs when a turn completes — determines whether to continue automatically. Mat
 }
 ```
 
-> `decision: "block"` tells Codex to **continue** (not reject). The reason becomes the next prompt text. If any matching hook returns `continue: false`, that takes precedence.
+> `decision: "block"`은 Codex에게 **거부가 아니라 계속 진행**하라고 지시합니다. reason은 다음 프롬프트 텍스트가 됩니다. 매치된 hook 중 하나라도 `continue: false`를 반환하면 그 값이 우선합니다.
 
-## Common Input Fields
+## 공통 입력 필드
 
-Every command hook receives JSON on stdin:
+모든 command hook은 stdin으로 JSON을 받습니다.
 
-| Field | Type | Description |
+| 필드 | 타입 | 설명 |
 |-------|------|-------------|
-| `session_id` | string | Session/thread ID |
-| `transcript_path` | string \| null | Path to session transcript |
-| `cwd` | string | Working directory |
-| `hook_event_name` | string | Current event name |
-| `model` | string | Active model slug |
-| `turn_id` | string | Turn-scoped hooks only |
+| `session_id` | string | 세션/스레드 ID |
+| `transcript_path` | string \| null | 세션 transcript 경로 |
+| `cwd` | string | 작업 디렉토리 |
+| `hook_event_name` | string | 현재 이벤트 이름 |
+| `model` | string | 활성 모델 slug |
+| `turn_id` | string | turn 범위 hook에서만 제공 |
 
-## Common Output Fields
+## 공통 출력 필드
 
-`SessionStart`, `UserPromptSubmit`, and `Stop` support:
+`SessionStart`, `UserPromptSubmit`, `Stop`은 다음 출력 필드를 지원합니다.
 
-| Field | Type | Description |
+| 필드 | 타입 | 설명 |
 |-------|------|-------------|
-| `continue` | boolean | `false` marks hook as stopped |
-| `stopReason` | string | Recorded as stop reason |
-| `systemMessage` | string | Surfaced as UI warning |
-| `suppressOutput` | boolean | Parsed, not yet implemented |
+| `continue` | boolean | `false`면 hook이 중지된 것으로 표시 |
+| `stopReason` | string | 중지 이유로 기록 |
+| `systemMessage` | string | UI 경고로 표시 |
+| `suppressOutput` | boolean | 파싱되지만 아직 구현되지 않음 |
 
-Exit `0` with no output is treated as success — Codex continues normally.
+출력 없이 `0`으로 종료하면 성공으로 간주되며 Codex는 정상적으로 계속 진행합니다.
 
-## Path Resolution
+## 경로 해석
 
-For repo-local hooks, prefer git-root-based paths to avoid issues when Codex starts from subdirectories:
+repo-local hook은 Codex가 하위 디렉토리에서 시작될 때의 문제를 피하기 위해 git root 기준 경로를 권장합니다.
 
 ```
 /usr/bin/python3 "$(git rev-parse --show-toplevel)/.codex/hooks/script.py"
 ```
 
-## Full Example
+## 전체 예시
 
 ```json
 {
@@ -283,13 +283,13 @@ For repo-local hooks, prefer git-root-based paths to avoid issues when Codex sta
 }
 ```
 
-## Anti-Patterns
+## 안티패턴
 
-| Anti-Pattern | Fix |
+| 안티패턴 | 해결책 |
 |---|---|
-| Relying on `PreToolUse` as a security boundary | Treat as a guardrail — the model can write scripts to bypass it |
-| Using relative paths in hook commands | Use `$(git rev-parse --show-toplevel)` for stability |
-| Missing the `[features]` flag | Always enable `codex_hooks = true` in `config.toml` |
-| Setting very long timeouts on blocking hooks | Keep timeouts short to avoid stalling the agent loop |
-| Assuming hooks can undo `PostToolUse` side effects | They can only replace the result, not reverse the action |
-| Not handling JSON stdin properly | Every hook receives JSON on stdin — parse it correctly |
+| `PreToolUse`를 보안 경계로 믿기 | 우회 가능한 가드레일로만 취급 |
+| hook 명령에서 상대 경로 사용 | 안정성을 위해 `$(git rev-parse --show-toplevel)` 사용 |
+| `[features]` 플래그 누락 | `config.toml`에서 항상 `codex_hooks = true` 활성화 |
+| 차단성 hook에 너무 긴 timeout 설정 | agent loop가 멈추지 않도록 짧게 유지 |
+| hooks가 `PostToolUse` 부작용을 되돌릴 수 있다고 가정 | 되돌릴 수 없고 결과만 대체 가능 |
+| JSON stdin 처리를 제대로 하지 않음 | 모든 hook은 stdin으로 JSON을 받으므로 정확히 파싱 |
