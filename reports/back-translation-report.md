@@ -13,17 +13,18 @@
 | 파일 | 결과 | 오류 | 경고 | 비교 섹션 수 | 상세 |
 |---|---|---:|---:|---|
 | `AGENTS.md` | PASS | 0 | 0 | 13 | 주요 개념, 설정 우선순위, 하네스 안내 의미와 제약 유지 |
-| `README.md` | PASS | 0 | 0 | 8 | 개념 표, 워크플로우 설명, 팁 섹션의 핵심 의미와 제약 유지 |
+| `README.md` | PASS | 0 | 0 | 20 | 개념 표, 개발 워크플로우, 팁/자료 섹션의 핵심 의미와 제약 유지 |
 | `best-practice/codex-agents-md.md` | PASS | 0 | 0 | 7 | 길이 제한, 계층 구조, 안티패턴 의미 유지 |
 | `best-practice/codex-config.md` | PASS | 0 | 0 | 8 | 설정 우선순위, 샌드박스, 승인 정책의 제약 유지 |
 | `best-practice/codex-hooks.md` | PASS | 0 | 0 | 16 | 이벤트 동작, 차단 의미, 훅 한계와 가드레일 설명 유지 |
 | `best-practice/codex-mcp.md` | PASS | 0 | 0 | 6 | MCP 범위 제한, 보안 지침, 안티패턴 의미 유지 |
-| `best-practice/codex-skills.md` | PASS | 0 | 0 | 10 | skill 패턴, frontmatter 지침, 안티패턴 의미 유지 |
+| `best-practice/codex-skills.md` | PASS | 0 | 0 | 8 | skill trigger 설계, 최소 메타데이터, 안티패턴 의미 유지 |
 | `best-practice/codex-subagents.md` | PASS | 0 | 0 | 18 | subagent 사용 조건, 승인 상속, CSV 배치 규칙 의미 유지 |
-| `docs/SKILLS.md` | PASS | 0 | 0 | 12 | SKILL 형식, 필드 정의, 탐색 경로, 패턴 설명 의미 유지 |
+| `docs/SKILLS.md` | PASS | 0 | 0 | 10 | skill 구조, 최소 SKILL.md, 탐색 경로, plugin 배포 의미 유지 |
 | `orchestration-workflow/orchestration-workflow.md` | PASS | 0 | 0 | 11 | Agent → Skill 패턴, 제약 설명, 실행 흐름 의미 유지 |
 | `.agents/skills/weather-svg-creator/SKILL.md` | PASS | 0 | 0 | 9 | 입력/출력 경로, 덮어쓰기 지침, 데이터 보존 제약 의미 유지 |
 | `.claude/hooks/HOOKS-README.md` | PASS | 0 | 0 | 22 | hook 유형, 옵션 제약, matcher 표, 버그/우회 설명 의미 유지 |
+| `.codex/hooks/HOOKS-README.md` | PASS | 0 | 0 | 11 | hook 이벤트, 버전 제약, 설정 파일, logging 동작 의미 유지 |
 
 ## 배치 A 재검토
 
@@ -91,3 +92,33 @@
 - 결과: PASS
 - 판단 근거: hook 이름, matcher 값, 환경 변수, 경로, JSON 예시, deprecated 제약, 지원/미지원 범위가 모두 유지됨
 - 특이사항: hook 이름, 설정 키, 경로, 환경 변수, JSON 필드, 제품명은 원문 식별자 보존을 우선함
+
+## upstream 변경 재번역
+
+### `README.md`
+
+- 비교 범위: 개념 표 전체, 개발 워크플로우 표, 팁과 트릭 확장 섹션, 영상/구독 섹션, 신규 배지와 참조 링크
+- 결과: PASS
+- 판단 근거: 신규 Commands, Skills, MCP, Config, Code Review 설명과 workflow/tips 확장 내용이 유지됨
+- 특이사항: 제품명, 명령어, badge label, path, 링크, 고유 식별자는 원문을 유지함
+
+### `best-practice/codex-skills.md`
+
+- 비교 범위: 핵심 패턴, 최소 frontmatter, progressive disclosure 구조, description 작성 규칙, optional metadata, anti-pattern 표
+- 결과: PASS
+- 판단 근거: skills를 slash command가 아닌 workflow로 본다는 최신 방향과 `agents/openai.yaml` 권장 구조가 유지됨
+- 특이사항: `SKILL.md`, `/skills`, `$skill-name`, `[[skills.config]]`, `agents/openai.yaml` 등 식별자는 원문을 유지함
+
+### `docs/SKILLS.md`
+
+- 비교 범위: skill 구조, 최소 `SKILL.md`, skill 활성화 방식, built-in skills, 탐색 경로, plugins 배포, `agents/openai.yaml`, best practices
+- 결과: PASS
+- 판단 근거: 최소 메타데이터 요구사항과 progressive disclosure, discovery path, plugin 배포 모델이 유지됨
+- 특이사항: frontmatter key, 경로, config key, MCP 의존성 예시는 원문 식별자를 유지함
+
+### `.codex/hooks/HOOKS-README.md`
+
+- 비교 범위: hook 이벤트 표, 버전 제약, `--hook` 호출 방식, SessionStart 컨텍스트 주입, 설정 파일, toggle key, logging, 테스트, 확장 포인트
+- 결과: PASS
+- 판단 근거: hook 수, 버전 조건, 설정 파일 역할, logging 위치, 테스트/확장 절차가 유지됨
+- 특이사항: hook 이름, config key, 경로, JSON 필드, 명령 예시는 원문 식별자를 유지함

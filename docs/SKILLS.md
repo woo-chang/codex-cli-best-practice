@@ -1,150 +1,118 @@
 # Skills 시스템 레퍼런스
 
-Skills는 Codex CLI의 기능을 확장하는 재사용 가능한 instruction package입니다. 이들은 공개 **SKILL.md 표준**을 따르므로, 프로젝트 간에 이식 가능하고 공유하기 쉽습니다.
+Skills는 Codex CLI에 집중된 workflow와 도메인 지식을 추가하는 재사용 가능한 instruction package입니다. 이들은 공개 `SKILL.md` 표준을 따르며, 재사용 가능한 Codex workflow를 작성하는 기본 형식입니다.
 
-## SKILL.md 파일 형식
+## Skill 구조
 
-Skills는 `.agents/skills/<name>/SKILL.md`에 위치합니다. 각 skill은 YAML 프론트매터를 포함한 Markdown 파일입니다.
+Skills는 `.agents/skills/<name>/` 아래에 위치하며 반드시 `SKILL.md`를 포함해야 합니다. skill 디렉토리에는 progressive disclosure를 위한 보조 자료도 함께 둘 수 있습니다.
+
+```text
+.agents/skills/
+  my-skill/
+    SKILL.md
+    scripts/
+    references/
+    assets/
+    agents/
+      openai.yaml
+```
+
+- `SKILL.md`: 필수 지침과 메타데이터
+- `scripts/`: 선택적 실행 helper
+- `references/`: 선택적 문서와 예제
+- `assets/`: 선택적 템플릿 또는 정적 리소스
+- `agents/openai.yaml`: 선택적 UI, 정책, 의존성 메타데이터
+
+## 최소 `SKILL.md`
+
+Codex는 YAML frontmatter에 `name`과 `description`만 요구합니다.
 
 ```markdown
 ---
 name: my-skill
-description: When to invoke this skill — used for auto-discovery
-argument-hint: "[file-path]"
-allowed-tools: Bash, Read, Write, Edit, Glob, Grep
-model: o4-mini
+description: Explain exactly when this skill should and should not trigger.
 ---
 
-# My Skill Instructions
+# My Skill
 
-Detailed instructions for what the skill should do when invoked...
+Instructions Codex should follow when this skill is activated.
 ```
 
-## 프론트매터 필드
+`description`은 암묵 호출의 trigger surface이므로, "언제 이 skill이 발동해야 하는가?"를 정확히 쓰는 문장이어야 합니다.
 
-| 필드 | 타입 | 기본값 | 설명 |
-|---|---|---|---|
-| `name` | string | 디렉토리 이름 | 표시 이름과 `/slash-command` 트리거 |
-| `description` | string | — | 목적 설명. auto-discovery 순위에 사용 |
-| `argument-hint` | string | — | `/name` 뒤에 표시되는 자동완성 힌트. 예: `[issue-number]` |
-| `disable-model-invocation` | bool | `false` | 자동 호출을 막습니다. 명시적으로만 호출 가능 |
-| `user-invocable` | bool | `true` | `false`면 `/` 메뉴에 숨겨짐. 배경 지식용 |
-| `allowed-tools` | string | — | 추가 승인 없이 허용되는 도구 목록. 쉼표로 구분 |
-| `model` | string | Inherited | 사용할 모델. 예: `o4-mini`, `o3`, `gpt-4.1` |
-| `context` | string | — | 고립된 subagent 컨텍스트에서 실행하려면 `fork`로 설정 |
-| `agent` | string | `general-purpose` | `context: fork`일 때 사용할 subagent 유형 |
-| `hooks` | object | — | 이 skill에 범위 지정된 lifecycle hooks |
+## Codex가 Skills를 사용하는 방식
 
-## 문자열 치환
+Codex는 skill을 두 가지 방식으로 활성화할 수 있습니다.
 
-Skills는 동적 변수 주입을 지원합니다.
+1. 명시 호출: 프롬프트에서 skill을 직접 언급합니다. CLI나 IDE에서는 `/skills`를 사용하거나 `$`를 입력해 skill mention을 넣습니다.
+2. 암묵 호출: 작업이 skill의 `description`과 맞으면 Codex가 해당 skill을 선택합니다.
 
-| 변수 | 확장 결과 |
-|---|---|
-| `$ARGUMENTS` | skill 이름 뒤에 전달된 전체 인자 문자열 |
-| `$0` | 첫 번째 위치 인자 |
-| `$1`, `$2`, ... | 그 이후 위치 인자 |
-
-**예시**: 사용자가 `/deploy staging v2.1`을 입력하면, `$ARGUMENTS`는 `staging v2.1`, `$0`는 `staging`, `$1`은 `v2.1`입니다.
+Codex는 skills에 progressive disclosure를 사용합니다. `name`, `description`, 경로, 선택적 `agents/openai.yaml` 같은 메타데이터로 시작한 뒤, skill이 선택되었을 때만 전체 `SKILL.md`를 읽습니다.
 
 ## Built-in Skills
 
-Codex CLI는 `$` 접두사가 붙은 built-in skills를 몇 가지 제공합니다.
+Codex는 기본적으로 system skills를 함께 제공합니다. 흔한 예시는 다음과 같습니다.
 
-### $plan
-구조화된 planning skill입니다. 복잡한 작업을 실행하기 전에 단계별 계획을 만듭니다. 작업이 다단계로 보이면 자동으로 호출됩니다.
+- `$plan`
+- `$skill-creator`
+- `$skill-installer`
 
-### $skill-creator
-새 SKILL.md 파일을 생성하는 meta-skill입니다. `/skill-creator`로 호출하고, skill이 무엇을 해야 하는지 설명하면 됩니다.
-
-### $web-search
-웹 검색 기능입니다. 현재 정보가 필요한 질문에 답하기 위해 웹 콘텐츠를 가져오고 처리합니다.
+built-in skill 목록은 릴리스마다 달라질 수 있으므로, 고정 목록보다는 예시 중심으로 다루는 편이 안전합니다.
 
 ## 탐색 경로
 
-Codex CLI는 여러 위치에서 skills를 찾으며, 우선순위는 다음과 같습니다.
+Codex는 다음 위치에서 skills를 찾습니다.
 
-1. **Project skills**: 현재 프로젝트의 `./.agents/skills/` 아래. repo root까지 스캔
-2. **User skills**: 개인용 cross-project skills를 위한 `~/.agents/skills/`
-3. **Built-in skills**: Codex CLI와 함께 제공되는 skills (`$plan`, `$skill-creator` 등)
+1. 현재 작업 디렉토리에서 repo root까지의 repository skills: `.agents/skills/`
+2. 사용자 skills: `~/.agents/skills/`
+3. 관리자 skills: `/etc/codex/skills`
+4. Codex에 번들된 system skills
 
-같은 이름의 skill이 여러 개 있으면 가장 로컬한 버전이 우선합니다. 즉 `project > user > built-in` 순입니다.
+Codex는 현재 작업 디렉토리에서 위로 올라가며 repository 위치를 스캔합니다. 같은 이름의 skill이 둘 이상 있어도 병합하지 않습니다.
 
-## Skill 패턴
+## Plugins로 Skills 배포하기
 
-### 사용자 호출형 Skill (Slash Command)
-```yaml
----
-name: deploy
-description: Deploy the application to a target environment
-argument-hint: "[environment] [version]"
-allowed-tools: Bash, Read
----
-```
-사용자는 `/deploy production v2.0`처럼 호출합니다.
+skills는 작성 형식이고, plugins는 재사용 가능한 skills, apps, MCP integration을 배포하는 설치 단위입니다.
 
-### 에이전트 사전 로드 Skill (배경 지식)
-```yaml
----
-name: code-standards
-description: Team coding standards and conventions
-user-invocable: false
----
-```
-`.codex/config.toml`의 `[agents.<name>]` 역할 설정과 companion TOML 파일을 통해 agent 컨텍스트에 로드됩니다.
+repo 내부 workflow와 일상적인 작성에는 직접 skill 폴더를 사용합니다. skills를 배포하거나 apps, MCP config와 함께 묶거나 marketplace를 통해 배포하려면 plugin으로 패키징합니다.
+
+## Skills 활성화/비활성화
+
+skill을 삭제하지 않고 끄려면 `~/.codex/config.toml`의 `[[skills.config]]`를 사용합니다.
 
 ```toml
-# .codex/config.toml
-[agents.backend-dev]
-description = "Handles backend development tasks"
-config_file = "agents/backend-dev.toml"
+[[skills.config]]
+path = "/path/to/skill/SKILL.md"
+enabled = false
 ```
 
-```toml
-# .codex/agents/backend-dev.toml
-model = "o4-mini"
-skills = ["code-standards"]
-```
+skill config를 바꾼 뒤에는 Codex를 재시작합니다.
 
-`/` 메뉴에는 표시되지 않습니다.
+## `agents/openai.yaml`을 이용한 선택적 메타데이터
 
-### Forked Skill (고립 실행)
+문서화되지 않은 frontmatter 필드에 의존하지 말고, 선택적 UI, 정책, 의존성 메타데이터에는 `agents/openai.yaml`을 사용합니다.
+
 ```yaml
----
-name: security-audit
-description: Run security analysis in isolated context
-context: fork
-agent: security-reviewer
-allowed-tools: Bash, Read, Grep, Glob
----
+interface:
+  display_name: "Docs Helper"
+  short_description: "Verifies framework APIs before code changes"
+
+policy:
+  allow_implicit_invocation: false
+
+dependencies:
+  tools:
+    - type: mcp
+      value: openaiDeveloperDocs
+      description: OpenAI Docs MCP server
+      transport: streamable_http
+      url: https://developers.openai.com/mcp
 ```
-메인 대화를 오염시키지 않기 위해 별도의 subagent 컨텍스트에서 실행됩니다.
 
-## 예시: 완전한 Skill
+## 모범 사례
 
-```markdown
----
-name: pr-review
-description: Review a pull request and provide structured feedback
-argument-hint: "[pr-number]"
-allowed-tools: Bash, Read, Grep, Glob
-model: o4-mini
----
-
-# PR Review Skill
-
-Review pull request #$0 and provide structured feedback.
-
-## Steps
-1. Fetch the PR diff using `gh pr diff $0`
-2. Read all changed files for full context
-3. Analyze for: correctness, security issues, performance, style
-4. Output a structured review with severity ratings
-
-## Output Format
-다음 템플릿을 사용합니다.
-- **Critical**: Issues that must be fixed
-- **Warning**: Issues that should be addressed
-- **Suggestion**: Optional improvements
-- **Praise**: What was done well
-```
+- 각 skill은 하나의 작업에 집중시킵니다.
+- 결정적 동작이나 외부 도구가 꼭 필요하지 않다면 scripts보다 instructions를 우선합니다.
+- `description` 필드는 마케팅 문구가 아니라 trigger condition으로 작성합니다.
+- `SKILL.md`를 짧게 유지하려면 `references/`, `scripts/`를 사용합니다.
+- 단일 repo 밖에서 재사용하려면 plugins를 사용합니다.

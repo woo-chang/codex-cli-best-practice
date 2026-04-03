@@ -1,153 +1,99 @@
 # 모범 사례: Skills
 
-Skills는 재사용 가능하고 조합 가능한 instruction package로 Codex CLI를 확장하는 기본 메커니즘입니다. 이들은 SKILL.md 공개 표준을 따릅니다.
+Skills는 재사용 가능하고 조합 가능한 instruction package로 Codex CLI를 확장하는 기본 메커니즘입니다. 이들은 `SKILL.md` 표준을 따르며, 범위가 좁고 트리거가 명확하고 컨텍스트를 작게 유지할수록 가장 잘 동작합니다.
 
-## 두 가지 Skill 패턴
+## 핵심 패턴
 
-### 1. 사용자 호출형 Skills (Slash Commands)
+Codex는 skills를 두 가지 방식으로 사용합니다.
 
-사용자가 `/skill-name`으로 명시적으로 호출합니다.
+1. 명시 호출: 프롬프트에서 skill을 직접 언급합니다. CLI나 IDE에서는 `/skills`를 사용하거나 `$`를 입력해 skill mention을 넣습니다.
+2. 암묵 호출: 작업이 skill의 `description`과 맞으면 Codex가 해당 skill을 선택합니다.
+
+즉 `description` 필드는 skill 메타데이터에서 가장 중요한 부분입니다.
+
+## 최소 Frontmatter
+
+문서화된 이유가 없다면 필수 frontmatter만 사용합니다.
 
 ```yaml
 ---
-name: deploy
-description: Deploy to target environment
-argument-hint: "[env] [version]"
-allowed-tools: Bash, Read
+name: docs-helper
+description: Verify framework API details before making code changes or writing migration guidance.
 ---
 ```
 
-**적합한 경우**: 사용자가 필요할 때 직접 실행하는 워크플로우. 예: deploy, review, generate
+나머지 skill 본문은 입력, workflow, expected outputs에 집중해야 합니다.
 
-### 2. 에이전트 사전 로드 Skills (배경 지식)
+## Progressive Disclosure용 구조
 
-일반 skill로 정의한 뒤, 현재 에이전트 설정 모델을 통해 에이전트에 연결합니다.
+Codex가 필요할 때만 추가 정보를 읽을 수 있도록 skill을 구성합니다.
 
-```toml
-# .codex/config.toml
-[agents.api-developer]
-description = "Builds and reviews HTTP APIs"
-config_file = "agents/api-developer.toml"
-```
-
-```toml
-# .codex/agents/api-developer.toml
-model = "o4-mini"
-skills = ["api-conventions", "error-handling"]
-
-prompt = """
-Work on backend APIs for this project.
-"""
-```
-
-**적합한 경우**: 에이전트는 필요하지만 사용자가 직접 호출하지는 않는 도메인 지식
-
-## 프론트매터 가이드
-
-### 설명적인 `description` 필드 작성
-description은 auto-discovery를 좌우합니다. 언제 이 skill을 써야 하는지 구체적으로 적어야 합니다.
-
-```yaml
-# Good: 구체적인 트리거 조건
-description: Review TypeScript files for type safety issues and suggest fixes
-
-# Bad: 모호해서 너무 많은 맥락에 걸림
-description: Help with TypeScript
-```
-
-### `allowed-tools`는 좁게 제한
-skill이 실제로 필요한 도구만 허용합니다.
-
-```yaml
-# Good: 최소 권한
-allowed-tools: Read, Grep, Glob
-
-# Bad: 지나치게 넓은 권한
-allowed-tools: Bash, Read, Write, Edit, Glob, Grep, WebFetch
-```
-
-### 적절한 모델 선택
-단순 작업에는 더 저렴한 모델을 사용합니다.
-
-```yaml
-# 빠른 분석 작업
-model: o4-mini
-
-# 복잡한 추론 작업
-model: o3
-```
-
-## Skill 구성
-
-```
+```text
 .agents/skills/
-  deploy/
-    SKILL.md          # Main skill instructions
-  pr-review/
+  docs-helper/
     SKILL.md
-  code-standards/     # Agent-preloaded, not user-invocable
-    SKILL.md
-  security-audit/
-    SKILL.md
+    references/
+    scripts/
+    assets/
+    agents/
+      openai.yaml
 ```
 
-### 이름 규칙
-- 디렉토리 이름은 kebab-case 사용: `pr-review`, `prReview`는 지양
-- 이름은 짧되 설명 가능해야 함
-- `helper`, `utils` 같은 일반적인 이름은 피함
+- 핵심 workflow 지침은 `SKILL.md`에 둡니다.
+- 깊은 참고 자료는 `references/`에 둡니다.
+- 결정적인 helper는 `scripts/`에 둡니다.
+- 선택적 UI 메타데이터, invocation policy, tool dependency는 `agents/openai.yaml`을 사용합니다.
 
-## 문자열 치환
+## 더 나은 Description 작성
 
-전체 인자 문자열에는 `$ARGUMENTS`, 첫 번째 위치 인자에는 `$0`를 사용합니다.
+좋은 description은 trigger condition처럼 동작합니다.
 
-```markdown
----
-name: fix-issue
-argument-hint: "[issue-number]"
----
+```yaml
+# Good
+description: Review TypeScript changes for type-safety regressions and missing runtime validation.
 
-# Fix Issue Skill
-
-Fetch issue #$0 from GitHub and implement a fix:
-1. Run `gh issue view $0` to read the issue
-2. Analyze the reported problem
-3. Implement and test the fix
+# Bad
+description: Help with TypeScript.
 ```
 
-## Skills 조합
+언제 이 skill이 발동해야 하는지, 필요하다면 언제 발동하지 말아야 하는지까지 구체적으로 씁니다.
 
-### Commands를 통한 Skill 체인
-하나의 command로 여러 skills를 오케스트레이션할 수 있습니다.
+## 현재 Codex 동작 기준으로 설계하기
 
-```markdown
-<!-- commands/full-review.md -->
-1. Invoke /security-audit on the changed files
-2. Invoke /pr-review for code quality
-3. Combine findings into a single report
-```
+- skills를 custom slash command가 아니라 재사용 가능한 workflow로 취급합니다.
+- 명시 호출 예시는 `/skills`와 `$skill-name` mention을 우선 사용합니다.
+- 단일 repo 밖으로 재사용 가능한 skills를 배포할 때는 plugins를 사용합니다.
+- skill을 삭제하지 않고 끄려면 `~/.codex/config.toml`의 `[[skills.config]]`를 사용합니다.
 
-### Agent + Skills
-사전 로드된 skills를 가진 에이전트는 사용자 개입 없이 도메인 지식을 활용할 수 있습니다.
+예시:
 
 ```toml
-# .codex/config.toml
-[agents.backend-dev]
-description = "Handles backend development tasks"
-config_file = "agents/backend-dev.toml"
+[[skills.config]]
+path = "/path/to/skill/SKILL.md"
+enabled = false
 ```
 
-```toml
-# .codex/agents/backend-dev.toml
-model = "o4-mini"
-skills = ["api-conventions", "database-patterns", "error-handling"]
+## 선택적 메타데이터
+
+더 풍부한 메타데이터가 필요하면 `agents/openai.yaml`을 사용합니다.
+
+```yaml
+interface:
+  display_name: "Docs Helper"
+  short_description: "Checks APIs before code changes"
+
+policy:
+  allow_implicit_invocation: false
 ```
+
+UI 표현과 invocation policy는 여기에 두는 것이 맞습니다. 오래됐거나 문서화되지 않은 frontmatter 필드에 의존하지 마십시오.
 
 ## 안티패턴
 
 | 안티패턴 | 해결책 |
 |---|---|
-| 모든 지침을 AGENTS.md에 넣기 | 집중된 skills로 분리 |
-| 100줄이 넘는 skills | 여러 skills로 나누거나 링크 문서 사용 |
-| 모든 걸 다 하는 skills | 하나의 skill은 하나의 책임만 |
-| 지식용 skills에 `user-invocable: false`를 빼먹기 | 에이전트 전용 skill에는 항상 설정 |
-| 환경별로 달라지는 값을 하드코딩하기 | 동적 값에는 `$ARGUMENTS` 사용 |
+| skills를 `/skill-name` slash command처럼 다루기 | `/skills` 또는 `$skill-name` mention으로 명시 호출을 문서화 |
+| `user-invocable`, `allowed-tools`, `context: fork` 같은 문서화되지 않은 frontmatter 사용 | 현재 문서화된 `SKILL.md` + `agents/openai.yaml` 패턴 사용 |
+| `skills = [...]`를 도메인 지식을 붙이는 주된 방식으로 간주 | description으로 trigger되게 하거나 `[[skills.config]]`로 가용성 관리 |
+| 모든 지침을 `AGENTS.md`에 넣기 | 집중된 workflow를 skills로 분리 |
+| 모든 것과 매칭되는 넓은 description 작성 | `description`을 정확한 trigger condition으로 작성 |
