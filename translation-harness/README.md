@@ -21,6 +21,7 @@
 
 - `AGENTS.md`: 짧은 진입점과 탐색 안내
 - `.agents/skills/translation-rules/SKILL.md`: 번역 경계와 용어 규칙
+- `.agents/skills/translation-targets/SKILL.md`: 번역 대상 배치와 재번역 식별 규칙
 - `.agents/skills/validation-rules/SKILL.md`: 구조 검증 체크리스트
 - `.agents/skills/sync-upstream/SKILL.md`: `main`과 `ko` 동기화 절차
 - `.agents/skills/commit-rules/SKILL.md`: 한글 커밋 메시지와 커밋 전 검증 규칙
@@ -28,6 +29,7 @@
 - `reports/translation-progress.md`: 배치 진행 현황
 - `reports/back-translation-report.md`: 역번역 의미 검증 결과
 - `reports/retranslation-needed.md`: upstream 동기화 후 재번역 필요 목록
+- `translation-harness/translation-targets.md`: 배치별 번역 대상 목록
 - `translation-harness/commit-policy.md`: 커밋 정책 요약
 
 ## 운영 원칙
@@ -45,7 +47,7 @@
 
 1. `main`을 `upstream` 기준으로 동기화합니다.
 2. `main`을 `ko`에 병합합니다.
-3. 변경된 번역 대상 파일을 `reports/retranslation-needed.md`에 기록합니다.
+3. `translation-targets` 규칙으로 변경된 번역 대상 파일을 식별해 `reports/retranslation-needed.md`에 기록합니다.
 4. 원문 스냅샷을 `.originals/`에 저장합니다.
 5. `ko`에서 선택한 배치를 번역합니다.
 6. `validation-rules` 기준으로 구조 검증을 수행합니다.
@@ -54,13 +56,7 @@
 
 ## 현재 번역 범위
 
-- `AGENTS.md`
-- `README.md`
-- `best-practice/*.md`
-- `docs/*.md`
-- `orchestration-workflow/*.md`
-
-별도 규칙이 추가되기 전까지는 마크다운 산문만 번역 대상으로 취급합니다.
+현재 배치 목록과 파일별 범위는 `translation-harness/translation-targets.md`를 기준으로 관리합니다.
 
 ## 충돌 최소화 원칙
 
