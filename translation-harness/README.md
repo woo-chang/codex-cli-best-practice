@@ -30,9 +30,11 @@
 - `.originals/`: 역번역 검증용 임시 원문 스냅샷 디렉토리. 커밋하지 않습니다
 - `reports/translation-progress.md`: 현재 점검 상태와 최근 처리 범위
 - `reports/back-translation-report.md`: 역번역 의미 검증 결과
+- `reports/claude-parity-report.md`: Claude 하네스와의 정합성 점검 결과
 - `reports/retranslation-needed.md`: upstream 동기화 후 재번역 필요 목록
 - `translation-harness/translation-targets.md`: 규칙 기반 번역 대상 판정 기준
 - `translation-harness/commit-policy.md`: 커밋 정책 요약
+- `translation-harness/claude-parity.md`: Claude 하네스와 비교하는 기준과 절차
 
 ## 운영 원칙
 
@@ -45,6 +47,7 @@
 7. upstream 동기화 중 충돌이 발생하면 로컬 번역보다 upstream 영어 원문을 우선 수용하고, 해당 파일을 재번역 대상으로 돌립니다.
 8. 커밋은 `영어 접두사 + 한글 요약` 형식을 사용하고, upstream 동기화 커밋과 번역 커밋을 분리합니다.
 9. 검증에서 실패한 파일은 수정 후 재검증합니다. 재검증 대상은 기본적으로 실패한 파일만으로 제한합니다.
+10. 하네스 규칙을 바꾼 뒤에는 필요 시 Claude 저장소와의 정합성 점검을 수행합니다.
 
 ## 권장 루프
 
